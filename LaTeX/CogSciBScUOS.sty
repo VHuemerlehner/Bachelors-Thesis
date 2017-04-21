@@ -1,0 +1,157 @@
+%You need to have the package fancyhdr!!! Info on this package:
+%http://www.ctan.org/tex-archive/macros/latex/contrib/fancyhdr/fancyhdr.pdf
+
+%idea based on Stanford University thesis style file, available here:
+%http://help-csli.stanford.edu/tex/suthesis/
+
+\RequirePackage{setspace}
+\RequirePackage{fancyhdr}
+
+% Use 1.3 times the normal baseline-to-baseline skip
+\setstretch{1.3}
+
+% We need 1" margins except on the binding edge, where it is 1 1/2"
+% Theses may be either single or double sided
+  \if@twoside
+     \setlength\oddsidemargin   {36.1\p@}
+     \setlength\evensidemargin  {0\p@}
+     \setlength\marginparwidth {40\p@}
+  \else
+     \setlength\oddsidemargin   {36.1\p@}
+     \setlength\evensidemargin  {36.1\p@}
+     \setlength\marginparwidth  {40\p@}
+  \fi
+
+\marginparsep 10pt
+%\oddsidemargin 0.5in \evensidemargin 0in
+%\marginparwidth 40pt 
+
+
+\topmargin 0pt \headsep .5in
+\textheight 8.1in \textwidth 6in
+
+% Disallow page breaks at hyphens (this will give some underfull vbox's,
+% so an alternative is to use \brokenpenalty=100 and manually search
+% for and fix such page breaks)
+\brokenpenalty=10000
+
+
+% \author, \title are defined in report; here are the rest of the
+% front matter defining macros
+\def\dept#1{\gdef\@dept{#1}}
+\def\signline#1{\gdef\@signline{#1}}
+\def\signcity#1{\gdef\@signcity{#1}}
+\def\submitdate#1{\gdef\@submitdate{#1}}
+%\def\language#1{\gdef\@language{#1}} \def\@language{babel}
+\def\@title{}
+\def\@author{}
+\def\@dept{Cognitive Science, University of Osnabr\"uck}
+\def\@signcity{Osnabr\"uck}
+
+\def\@submitdate{\ifcase\the\month\or
+  January\or February\or March\or April\or May\or June\or
+  July\or August\or September\or October\or November\or December\fi
+  \space \number\the\year}
+
+\def\@signline{\@signcity, \@submitdate}
+
+\def\firstSupervisor#1{\gdef\@firstSupervisor{#1}}
+\def\secondSupervisor#1{\gdef\@secondSupervisor{#1}}
+\def\email#1{\gdef\@email{#1}}
+
+\def\titlep{%TITLEPAGE
+        \thispagestyle{empty}%
+        \null\vskip1in%
+        \begin{center}
+                \Large\uppercase\expandafter{\@title}
+        \end{center}
+        \vfill
+        \begin{center}
+                \sc \@author\\ \@dept \\ \@email
+               
+        \end{center}
+        \vfill
+        \begin{center}
+		\rm Supervisors\\ 
+		\@firstSupervisor  \\
+		\@secondSupervisor \linebreak\\
+		\@submitdate\\
+        \end{center}\vskip.5in}
+
+
+
+\def\beforepreface{ %initialization stuff
+
+\pagestyle{fancy}
+\fancyhead{}
+\fancyfoot{}
+\fancyfoot[C]{\thepage}
+
+%NUMGBRING OPTIONS:
+\numberwithin{figure}{chapter} %or {section}
+\numberwithin{table}{chapter}
+%or
+%\renewcommand{\theequation}{\thesection.\arabic{equation}} 
+%\setcounter{equation}{0}
+\setcounter{tocdepth}{1}    %set to 2 if you want to get subsections
+                            %listed in the table of contents
+\setcounter{secnumdepth}{2} %assign number up to this level, where
+                            %2 = subsection
+                            %1 = section
+
+        \pagenumbering{roman}
+        \thispagestyle{plain}
+        \titlep}
+        
+
+\def\prefacesection#1{%
+      \newpage
+	\textbf{#1}\linebreak\linebreak
+	\thispagestyle{plain}
+       % \addcontentsline{toc}{chapter}{#1}
+}
+\def\afterpreface{\newpage
+        \tableofcontents }
+
+\def\closing{ %the clause that you did not cheat 
+   \newpage
+   \thispagestyle{plain}
+\paragraph{}
+Hereby I confirm that I wrote this thesis independently and that I have not made use
+of any other resources or means than those indicated.
+\paragraph{}
+Hiermit best\"atige ich, dass ich die vorliegende Arbeit selbstst\"andig verfasst und keine 
+anderen als die angegebenen Quellen und Hilfsmittel verwendet habe.\\\\\\\\
+\@signline
+}
+
+% Redefine \thebibliography to go to a new page and put an entry in the
+% table of contents
+\let\@ldthebibliography\thebibliography
+\renewcommand{\thebibliography}[1]{\newpage
+                \@ldthebibliography{#1}%
+    \@tempcnta=\thechapter \advance\@tempcnta by 1
+    \edef\thechapter{\number\the\@tempcnta}
+\addcontentsline{toc}{chapter}{\protect\numberline{\thechapter}\bibname}
+}
+
+\def\@makechapterhead#1{%
+  \vspace*{50\p@}%
+  {\parindent \z@ \raggedright \normalfont
+%    \ifnum \c@secnumdepth >\m@ne
+%        \huge\bfseries \@chapapp\space \thechapter
+%        \par\nobreak
+%        \vskip 20\p@
+%    \fi
+    \interlinepenalty\@M
+    \Huge \bfseries \thechapter\ #1\par\nobreak
+    \vskip 40\p@
+  }
+\fancyhead[LE]{\thechapter\ #1}
+\fancyhead[RO]{}
+}
+
+\def\newsection#1{
+\section{#1}
+\fancyhead[RO]{\thesection\ #1}
+}

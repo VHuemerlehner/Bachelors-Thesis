@@ -1,0 +1,53 @@
+TS;3/4
+Grp;0
+Bar;0         0.5
+Bar;0  1  2
+Bar;0  1  2
+Bar;0  2
+TS;2/4
+Bar;0
+TS;3/4
+Bar;0  1  2
+Bar;0  1  2
+Grp;18
+Bar;0         0.5           1           2
+Bar;0  1  2
+Bar;0  2
+Bar;0  2
+Bar;0  1  2
+Bar;0  2
+TS;2/4
+Bar;0  1
+Bar;0  1
+TS;3/4
+Bar;0  1  2
+Bar;0  1  2
+TS;2/4
+Bar;0  1
+TS;3/4
+Bar;0  1
+Grp;51
+Bar;0  1  2
+TS;2/4
+Bar;0  1
+TS;3/4
+Bar;0  2
+Bar;0  1  2
+TS;2/4
+Bar;0  1
+TS;3/4
+Bar;0  2
+Grp;67
+Bar;0         0.5           1           2
+Bar;0  1  2
+Bar;0  1  2
+TS;2/4
+Bar;0  1
+Bar;0  1
+Bar;0  1
+Bar;0  1
+Bar;0  1
+Bar;0
+TS;3/4
+Bar;0
+Bar;0

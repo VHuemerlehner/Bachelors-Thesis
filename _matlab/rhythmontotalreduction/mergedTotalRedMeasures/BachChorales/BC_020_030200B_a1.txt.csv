@@ -1,0 +1,27 @@
+TS;4/4
+Grp;0
+Bar;0
+Bar;0  1  2  3
+Bar;0  1  2
+Grp;8
+Bar;3
+Bar;0  1  2  3
+Bar;0         0.5           1           2
+Grp;16
+Bar;0
+Bar;0  1  2  3
+Bar;0
+Grp;23
+Bar;2
+Bar;0  1  2
+Grp;28
+Bar;3
+Bar;0         0.5           1         1.5           2
+Grp;32
+Bar;3
+Bar;0  1  2  3
+Bar;0
+Grp;38
+Bar;1  2  3
+Bar;0  1  2  3
+Bar;0  1  2

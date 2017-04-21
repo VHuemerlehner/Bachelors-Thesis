@@ -1,0 +1,92 @@
+function [listOfRhythms, ms, tr] = mergeTotalRedMeasure(foldName, filName)
+
+% load measures
+msF = sprintf('./measures/%s/%s', foldName, filName)
+
+fid = fopen(msF,'rt');
+ms = textscan(fid,'%s %s','Delimiter','\t');
+fclose(fid);
+
+% load total reduction
+trF = sprintf('./totalRed/%s/%s.csv.csv', foldName, filName);
+
+fid = fopen(trF,'rt');
+tr = textscan(fid,'%s %s','Delimiter',';');
+fclose(fid);
+
+% % take onsets of groupings
+% trGrp = tr{1,1}(circshift(strcmp(tr{1,1}, 'Grp'), [1 0]));
+% % take onsets of chord beginnings
+% trNum = tr{1,1};
+% trNum(strcmp(tr{1,1}, 'Grp')) = [];
+
+% two columns that includes all info
+% first we know that we want the TS
+listOfRhythms = {ms{1,1}{1}, ms{1,2}{1}};
+rhyListIDX = 1;
+trIDX = 1;
+
+for i = 2:length(ms{1,1})
+    if strcmp(ms{1,1}{i}, 'TS')
+        rhyListIDX = rhyListIDX + 1;
+        listOfRhythms{rhyListIDX, 1} = ms{1,1}{i};
+        listOfRhythms{rhyListIDX, 2} = ms{1,2}{i};
+    else
+        currMeasureOnset = str2num(ms{1,2}{i});
+        if i < length(ms{1,1})
+            nextMeasureOnset = str2num(ms{1,2}{i+1});
+            tmpBar = [];
+            while trIDX <= length(tr{1,2}) & ...
+                    str2num(tr{1,2}{trIDX}) < nextMeasureOnset
+                if strcmp(tr{1,1}{trIDX}, 'Grp')
+                    if ~isempty(tmpBar)
+                        rhyListIDX = rhyListIDX + 1;
+                        listOfRhythms{rhyListIDX, 1} = 'Bar';
+                        listOfRhythms{rhyListIDX, 2} = tmpBar;
+                        tmpBar = [];
+                    end
+                    rhyListIDX = rhyListIDX + 1;
+                    listOfRhythms{rhyListIDX, 1} = 'Grp';
+                    listOfRhythms{rhyListIDX, 2} = tr{1,2}{trIDX};
+                else
+                    tmpBar = [tmpBar, str2num(tr{1,2}{trIDX}) - ...
+                        currMeasureOnset];
+                end
+                trIDX = trIDX + 1;
+            end
+            rhyListIDX = rhyListIDX + 1;
+            listOfRhythms{rhyListIDX, 1} = 'Bar';
+            listOfRhythms{rhyListIDX, 2} = tmpBar;
+        else
+            nextMeasureOnset = str2num(tr{1,1}{end}) + 1;
+            tmpBar = [];
+            while trIDX <= length(tr{1,2}) & ...
+                    str2num(tr{1,2}{trIDX}) < nextMeasureOnset
+                if strcmp(tr{1,1}{trIDX}, 'Grp')
+                    if ~isempty(tmpBar)
+                        rhyListIDX = rhyListIDX + 1;
+                        listOfRhythms{rhyListIDX, 1} = 'Bar';
+                        listOfRhythms{rhyListIDX, 2} = tmpBar;
+                        tmpBar = [];
+                    end
+                    rhyListIDX = rhyListIDX + 1;
+                    listOfRhythms{rhyListIDX, 1} = 'Grp';
+                    listOfRhythms{rhyListIDX, 2} = tr{1,2}{trIDX};
+                else
+                    tmpBar = [tmpBar, str2num(tr{1,2}{trIDX}) - ...
+                        currMeasureOnset];
+                end
+                trIDX = trIDX + 1;
+            end
+            rhyListIDX = rhyListIDX + 1;
+            listOfRhythms{rhyListIDX, 1} = 'Bar';
+            listOfRhythms{rhyListIDX, 2} = tmpBar;
+        end
+    end
+end
+
+cell2csv(strcat(filName,'.csv'), listOfRhythms, ';');
+movefile(strcat(filName,'.csv'), ...
+    sprintf('./mergedTotalRedMeasures/%s',foldName));
+
+end

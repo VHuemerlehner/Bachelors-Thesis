@@ -1,0 +1,21 @@
+set output
+set terminal x11
+#set nokey
+set key below
+set title "blabla"
+set xlabel "time"
+set ylabel "output"
+set size ratio 0.2
+set xr[0:10000]
+#set yr[0:1.1]
+f(x)=cos(x)
+g(x)=sin(x)
+plot f(x) w lines lt 2 ,g(x) w lines lt 1
+
+#or  "Data.txt" using 1 t 'neuron getting input' w lines lt 1
+
+#set terminal postscript landscape enhanced monochrome solid
+#set terminal fig
+#set output "plot.fig"
+replot
+pause -1 "Hit return to finish"

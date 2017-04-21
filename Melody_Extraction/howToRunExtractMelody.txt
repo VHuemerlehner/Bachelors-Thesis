@@ -1,0 +1,1 @@
+python C:\Users\User\Desktop\Bachelors_Thesis\Melody_Extraction\readAllXMLExtractMelody.py "C:\Users\User\Desktop\Bachelors_Thesis\Idioms\BachChorales\\" "C:\Users\User\Desktop\Bachelors_Thesis\Melody_Extraction\melodies\BachChorales\\"

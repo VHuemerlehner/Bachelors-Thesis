@@ -1,0 +1,1 @@
+python C:\Users\User\Desktop\Bachelors_Thesis\melody_and_chords\readAllXMLtoMelHarmFiles.py "C:\Users\User\Desktop\Bachelors_Thesis\melody_and_chords\input\\" "C:\Users\User\Desktop\Bachelors_Thesis\melody_and_chords\output\\"

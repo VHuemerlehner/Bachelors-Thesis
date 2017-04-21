@@ -1,0 +1,325 @@
+from music21 import *
+import os
+
+def writeHarmToFile(p,pieceName,currFolder,destFolder):
+    
+    # get the desired parts
+    p0 = p.parts[0]
+    p1 = p.parts[1]
+    p2 = p.parts[-4]
+    p3 = p.parts[-3]
+    p4 = p.parts[-2]
+    p5 = p.parts[-1]
+    
+    # extract surface melody from first part
+    p6 = p0.voicesToParts().parts[0];
+    # p6.show('t');
+
+    # chordify all parts
+    c0 = p0.chordify()
+    c1 = p1.chordify()
+    c2 = p2.chordify()
+    c3 = p3.chordify()
+    c4 = p4.chordify()
+    c5 = p5.chordify()
+    c6 = p6.chordify()
+
+    # flatten these parts
+    f0 = c0.flat
+    f1 = c1.flat
+    f2 = c2.flat
+    f3 = c3.flat
+    f4 = c4.flat
+    f5 = c5.flat
+    f6 = c6.flat
+
+
+    # get all chords
+    # print "Surface:"
+    surf0 = f0.getElementsByClass('Chord')
+    surf1 = f1.getElementsByClass('Chord')
+    # print "Tonality:"
+    ton = f2.getElementsByClass('Chord')
+    # print "Grouping:"
+    gr = f3.getElementsByClass('Chord')
+    # print "part5:"
+    ch4 = f4.getElementsByClass('Chord')
+    # print "part6:"
+    ch5 = f5.getElementsByClass('Chord')
+    # print "melody part:"
+    ch6 = f6.getElementsByClass('Chord')
+
+    # print "Tonality:"
+    # for i in ton:
+    #     print str(i.offset) + "\t" + str([lala.midi for lala in i.pitches])
+    # print "Grouping:"
+    # for i in gr:
+    #     print str(i.offset) + "\t" + str([lala.midi for lala in i.pitches])
+    
+    # initialise vars
+    i_s0 = 0
+    i_s1 = 0
+    i_ton = 0
+    i_gr = 0
+    i_p4 = 0
+    i_p5 = 0
+    i_p6 = 0
+    
+    if len(ton) != 0:
+        nextTon = ton[i_ton].offset
+        tonEnded = 0
+        tonFinalOffset = ton[-1].offset
+    else:
+        tonFinalOffset = 0
+        nextTon = 0
+        tonEnded = 1
+    
+    if len(gr) != 0:
+        nextGr = gr[i_gr].offset
+        grEnded = 0
+        grFinalOffset = gr[-1].offset
+    else:
+        nextGr = 0
+        grEnded = 1;
+        grFinalOffset = 0
+    
+    if len(surf0) != 0:
+        surf0FinalOffset = surf0[-1].offset
+        nextS0 = surf1[i_s0].offset
+        s0Ended = 0
+    else:
+        nextS0 = 0
+        s0Ended = 1
+        surf0FinalOffset = 0
+    
+    if len(surf1) != 0:
+        surf1FinalOffset = surf1[-1].offset
+        nextS1 = surf1[i_s1].offset
+        s1Ended = 0
+    else:
+        nextS1 = 0
+        s1Ended = 1
+        surf1FinalOffset = 0
+    
+    if len(ch4) != 0:
+        ch4FinalOffset = ch4[-1].offset
+        nextP4 = ch4[i_p4].offset
+        p4Ended = 0
+    else:
+        nextP4 = 0
+        p4Ended = 1
+        ch4FinalOffset = 0
+    
+    if len(ch5) != 0:
+        ch5FinalOffset = ch5[-1].offset
+        nextP5 = ch5[i_p5].offset
+        p5Ended = 0
+    else:
+        nextP5 = 0
+        p5Ended = 1
+        ch5FinalOffset = ch5[-1].offset
+    
+    if len(ch6) != 0:
+        ch6FinalOffset = ch6[-1].offset
+        nextP6 = ch6[i_p6].offset
+        p6Ended = 0
+    else:
+        nextP6 = 0
+        p6Ended = 1
+        ch6FinalOffset = ch6[-1].offset
+    
+    allEnded = 0
+    
+    # final offsets
+    endOffset = max([tonFinalOffset, grFinalOffset, ch4FinalOffset, ch5FinalOffset, surf0FinalOffset, surf1FinalOffset])
+    
+    splitName = pieceName.split(".")
+    noExtName = splitName[0]
+    finalName = noExtName+".txt"
+    text_file = open(finalName, "w")
+
+    while not(allEnded):
+        
+        if len(ton) == 0:
+            nextTon = max([nextGr, nextP4, nextP5, nextP6, nextS0, nextS1])
+        
+        if len(gr) == 0:
+            nextGr = max([nextTon, nextP4, nextP5, nextP6, nextS0, nextS1])
+        
+        if len(ch4) == 0:
+            nextP4 = max([nextTon, nextGr, nextP5, nextP6, nextS0, nextS1])
+        
+        if len(ch5) == 0:
+            nextP5 = max([nextTon, nextGr, nextP4, nextP6, nextS0, nextS1])
+        
+        if len(ch6) == 0:
+            nextP6 = max([nextTon, nextGr, nextP4, nextP5, nextS0, nextS1])
+        
+        if len(surf0) == 0:
+            nextS0 = max([nextTon, nextGr, nextP4, nextP5, nextP6, nextS1])
+        
+        if len(surf1) == 0:
+            nextS1 = max([nextTon, nextGr, nextP4, nextP5, nextP6, nextS0])
+        
+        currOffset = min([nextTon, nextGr, nextP4, nextP5, nextP6, nextS0, nextS1])
+    
+        # print "currOffset: " + str(currOffset)
+        # print "nextTon: " + str(nextTon)
+        # print "nextGr: " + str(nextGr)
+        # print "nextP4: " + str(nextP4)
+        # print "nextP5: " + str(nextP5)
+        # print str(ch5[i_p5].offset)
+        # print str(ch5[i_p5].duration.quarterLength)
+        # print str(ch4[i_p4].offset)
+        # print str(ch4[i_p4].duration.quarterLength)
+    
+        # write tonality
+        if (nextTon == currOffset) & (not(tonEnded)):
+            tmpStr = "tonality\t" + str(currOffset) + "\t" + str([lala.midi for lala in ton[i_ton].pitches]) + "\n"
+            text_file.write(tmpStr)
+            i_ton += 1
+            if i_ton < len(ton):
+                nextTon = ton[i_ton].offset
+            else:
+                tonEnded = 1
+                nextTon = endOffset
+    
+        # write grouping
+        if (nextGr == currOffset) & (not(grEnded)):
+            tmpStr = "grouping\t" + str(currOffset) + "\t" + str([lala.midi for lala in gr[i_gr].pitches]) + "\n"
+            text_file.write(tmpStr)
+            i_gr += 1
+            if i_gr < len(gr):
+                nextGr = gr[i_gr].offset
+            else:
+                grEnded = 1
+                nextGr = endOffset
+        
+        # write melody
+        if (nextP6 == currOffset) & (not(p6Ended)):
+            tmpStr = "melody\t" + str(currOffset) + "\t" + str([lala.midi for lala in ch6[i_p6].pitches]) + "\n"
+            text_file.write(tmpStr)
+            i_p6 += 1
+            if i_p6 < len(ch6):
+                nextP6 = ch6[i_p6].offset
+            else:
+                p6Ended = 1
+                nextP6 = endOffset
+        
+        
+        # write surface (parts 0-1) ======================================================================
+        if ((nextS0 == currOffset) & (nextS1 == currOffset)) & ((not(s0Ended)) & (not(s1Ended))):
+            tmpStr = "surface\t" + str(currOffset) + "\t" + str([lala.midi for lala in surf0[i_s0].pitches + surf1[i_s1].pitches]) + "\n"
+            # print "in 1 - " + "harmony\t" + str(currOffset) + "\t" + str([lala.midi for lala in ch4[i_s0].pitches + ch5[i_s1].pitches]) + "\n"
+            text_file.write(tmpStr)
+            i_s0 += 1
+            i_s1 += 1
+            if i_s0 < len(surf0):
+                nextS0 = surf0[i_s0].offset
+            else:
+                s0Ended = 1
+                nextS0 = endOffset
+            if i_s1 < len(surf1):
+                nextS1 = surf1[i_s1].offset
+            else:
+                s1Ended = 1
+                nextS1 = endOffset
+        elif (nextS0 == currOffset) & (not(s0Ended)):
+            tmpStr = "surface\t" + str(currOffset) + "\t" + str([lala.midi for lala in surf0[i_s0].pitches]) + "\n"
+            # print "in 2 - " + "harmony\t" + str(currOffset) + "\t" + str([lala.midi for lala in ch4[i_s0].pitches + ch5[i_p5].pitches]) + "\n"
+            # FIX 1 -- comment the below
+            # if len(ch5[i_p5]) != 0:
+            # print str(ch5[i_p5-1].offset) + str(ch5[i_p5-1].duration.quarterLength) + str(currOffset) + "\n"
+            if (i_s1-1 >= 0) & (surf1[i_s1-1].offset + surf1[i_s1-1].duration.quarterLength > currOffset):
+                tmpStr = "surface\t" + str(currOffset) + "\t" + str([lala.midi for lala in surf0[i_s0].pitches + surf1[i_s1-1].pitches]) + "\n"
+            else:
+                tmpStr = "surface\t" + str(currOffset) + "\t" + str([lala.midi for lala in surf0[i_s0].pitches]) + "\n"
+            # FIX 1 -- comment the above
+            text_file.write(tmpStr)
+            i_s0 += 1
+            if i_s0 < len(surf0):
+                nextS0 = surf0[i_s0].offset
+            else:
+                s0Ended = 1
+                nextS0 = endOffset
+        elif (nextS1 == currOffset) & (not(s1Ended)):
+            tmpStr = "surface\t" + str(currOffset) + "\t" + str([lala.midi for lala in surf1[i_s1].pitches]) + "\n"
+            # print "in 3 - " + "harmony\t" + str(currOffset) + "\t" + str([lala.midi for lala in ch4[i_s0].pitches + ch5[i_p5].pitches]) + "\n"
+            # FIX 1 -- comment the below
+            # if len(ch4[i_s0]) != 0:
+            # print str(ch4[i_p4-1].offset) + str(ch4[i_p4-1].duration.quarterLength) + str(currOffset) + "\n"
+            if (i_s0-1 >= 0) & (surf0[i_s0-1].offset + surf0[i_s0-1].duration.quarterLength > currOffset):
+                tmpStr = "surface\t" + str(currOffset) + "\t" + str([lala.midi for lala in surf0[i_s0-1].pitches + surf1[i_s1].pitches]) + "\n"
+            else:
+                tmpStr = "surface\t" + str(currOffset) + "\t" + str([lala.midi for lala in surf1[i_s1].pitches]) + "\n"
+            # FIX 1 -- comment the above
+            text_file.write(tmpStr)
+            i_s1 += 1
+            if i_s1 < len(surf1):
+                nextS1 = surf1[i_s1].offset
+            else:
+                s1Ended = 1
+                nextS1 = endOffset
+    
+        # write parts 4-5 ========================================================================
+        if ((nextP4 == currOffset) & (nextP5 == currOffset)) & ((not(p4Ended)) & (not(p5Ended))):
+            tmpStr = "reduction\t" + str(currOffset) + "\t" + str([lala.midi for lala in ch4[i_p4].pitches + ch5[i_p5].pitches]) + "\n"
+            # print "in 1 - " + "harmony\t" + str(currOffset) + "\t" + str([lala.midi for lala in ch4[i_p4].pitches + ch5[i_p5].pitches]) + "\n"
+            text_file.write(tmpStr)
+            i_p4 += 1
+            i_p5 += 1
+            if i_p4 < len(ch4):
+                nextP4 = ch4[i_p4].offset
+            else:
+                p4Ended = 1
+                nextP4 = endOffset
+            if i_p5 < len(ch5):
+                nextP5 = ch5[i_p5].offset
+            else:
+                p5Ended = 1
+                nextP5 = endOffset
+        elif (nextP4 == currOffset) & (not(p4Ended)):
+            tmpStr = "reduction\t" + str(currOffset) + "\t" + str([lala.midi for lala in ch4[i_p4].pitches]) + "\n"
+            # print "in 2 - " + "harmony\t" + str(currOffset) + "\t" + str([lala.midi for lala in ch4[i_p4].pitches + ch5[i_p5].pitches]) + "\n"
+            # FIX 1 -- comment the below
+            # if len(ch5[i_p5]) != 0:
+            # print str(ch5[i_p5-1].offset) + str(ch5[i_p5-1].duration.quarterLength) + str(currOffset) + "\n"
+            if (i_p5-1 >= 0) & (ch5[i_p5-1].offset + ch5[i_p5-1].duration.quarterLength > currOffset):
+                tmpStr = "reduction\t" + str(currOffset) + "\t" + str([lala.midi for lala in ch4[i_p4].pitches + ch5[i_p5-1].pitches]) + "\n"
+            else:
+                tmpStr = "reduction\t" + str(currOffset) + "\t" + str([lala.midi for lala in ch4[i_p4].pitches]) + "\n"
+            # FIX 1 -- comment the above
+            text_file.write(tmpStr)
+            i_p4 += 1
+            if i_p4 < len(ch4):
+                nextP4 = ch4[i_p4].offset
+            else:
+                p4Ended = 1
+                nextP4 = endOffset
+        elif (nextP5 == currOffset) & (not(p5Ended)):
+            tmpStr = "reduction\t" + str(currOffset) + "\t" + str([lala.midi for lala in ch5[i_p5].pitches]) + "\n"
+            # print "in 3 - " + "harmony\t" + str(currOffset) + "\t" + str([lala.midi for lala in ch4[i_p4].pitches + ch5[i_p5].pitches]) + "\n"
+            # FIX 1 -- comment the below
+            # if len(ch4[i_p4]) != 0:
+            # print str(ch4[i_p4-1].offset) + str(ch4[i_p4-1].duration.quarterLength) + str(currOffset) + "\n"
+            if (i_p4-1 >= 0) & (ch4[i_p4-1].offset + ch4[i_p4-1].duration.quarterLength > currOffset):
+                tmpStr = "reduction\t" + str(currOffset) + "\t" + str([lala.midi for lala in ch4[i_p4-1].pitches + ch5[i_p5].pitches]) + "\n"
+            else:
+                tmpStr = "reduction\t" + str(currOffset) + "\t" + str([lala.midi for lala in ch5[i_p5].pitches]) + "\n"
+            # FIX 1 -- comment the above
+            text_file.write(tmpStr)
+            i_p5 += 1
+            if i_p5 < len(ch5):
+                nextP5 = ch5[i_p5].offset
+            else:
+                p5Ended = 1
+                nextP5 = endOffset
+    
+        # check if all ended
+        if tonEnded & grEnded & p4Ended & p5Ended & s0Ended & s1Ended:
+            allEnded = 1
+    
+
+    text_file.close()
+
+    os.rename(currFolder+finalName, destFolder+finalName)

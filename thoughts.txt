@@ -1,0 +1,45 @@
+For each idiom examine the following:
+
+
+1) Are rhythms in melody and harmony related?
+
+
+2) If they are, according to which features?
+Are their distances similar for each measure? (could be related according to different subsets of features for different idioms)
+
+
+3) Are rhythms patterns per-piece "significantly" different in different idioms? If so according to which features?
+
+
+4) Are successions of rhythmic patters "complying" with the 1st order Markov assumption? ("Relatively" fixed probabilities for pattern transitions)
+
+
+5) What are the inter-idiom and extra-idiom distance relations in rhythms according to different metrics (e.g. Toussaint distances, or feature-based distances).
+
+
+6) Are some idioms closer to others (regarding harmonic rhythm)?
+Extra/future step, is harmonic rhythm enough for identifying musical idioms?
+
+
+
+What we deal with: harmonic changes on a level of harmonic reduction (what level? is it cognitively grounded?), in the form of rhythm sequences.
+
+
+What we don't deal with: the expression of rhythmic harmony on the level of texture - surface.
+
+
+
+Possible objectives:
+
+
+1) Analyse features of harmonic rhythm on reductions and relations between these harmonic rhythm sequences in different idioms.
+
+
+2) Examine possible relations between harmonic rhythm in reductions and melodic rhythm in the respective segments.
+
+
+3) Propose a generative model of reduction harmonic rhythm for melodic harmonisation, that learns from data, based on rhythmic features,
+transitions of rhythmic patters and relations between melody and harmony rhythm.
+
+
+4) (Kai-Uwe would be so happy :)) examine whether blending can fit in the picture...

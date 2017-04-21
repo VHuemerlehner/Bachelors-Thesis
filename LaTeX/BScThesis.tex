@@ -1,0 +1,72 @@
+%Quick Build F1
+%BibTex F11
+
+\documentclass[a4paper,12pt,twoside]{report}
+\usepackage{amsmath}
+\usepackage[]{graphicx}
+\usepackage[utf8]{inputenc}
+\usepackage{amssymb}
+\usepackage{CogSciBScUOS}
+
+
+\title{Automatic Extraction of Harmonic Rhythm from Melodies}
+\author{Valentin Huemerlehner}
+\email{vhuemerlehne@uni-osnabrueck.de}
+\firstSupervisor{Prof. Dr. Kai-Uwe Kühnberger}
+\secondSupervisor{PhD Maximos Kaliakatsos-Papakostas}
+
+
+\begin{document}
+
+\beforepreface %needed clause, generates e.g. title page
+
+\prefacesection{Abstract}
+In this thesis, I tried to extract the harmonic rhythm from a given melody. Alongside the melody, information on
+cadence placement and the bar boundaries are given. The system learned style-specific patterns from an
+annotated corpus of pieces in different styles, with the same information as above and additionally the original
+harmonisation in a reduction of medium depth. With this, I wanted to answer the question whether or not it may
+be possible to define one of the two elements necessary for a harmonisation (the harmonies and their locations)
+independently of the other. Achieving this would mean a step forward towards an autonomous harmonisation tool
+that is most importantly independent of its user's expert knowledge. Thus, such a system could also be used by
+musical beginners or completely musically inept users.
+
+\prefacesection{Acknowledgements}
+I would like to thank my supervisor Kai-Uwe Kühnberger, who gave me the idea and encouragement to try a
+project within musicology and then put me in touch with the musicology lab of Thessaloniki. There, I owe thanks
+to Emilios Cambouropoulos and Tsougras Costas for their musicological as well as computational insights and
+advice. However, the most help I received from Maximos Kaliakatsos-Papakostas, who had available not only
+advice, but also almonds in great abundance. His Matlab skills proved indispensable at many times and all ideas
+I had ran through his mind as a filter of feasability.
+
+\afterpreface %needed clause, generates e.g. table of contents
+\newpage
+
+%\listoffigures
+%\newpage
+
+\pagenumbering{arabic}
+
+%use   \newsection{XYZ}
+
+%instead of the "\section" command!
+
+\chapter{Theoretical Background}
+In the last years, scientific progress on computational creativity has accelerated more and more in all aspects
+of creativity. In the fine arts, this progress is mainly driven by neural networks, allowing for new techniques such
+as style overlaying or style blending and recombination of different aspects of an image (such as form and texture)
+[citation needed]. In music, neural networks are also beginning to make their mark, one example being "DeepBach",
+a neural network able to copy Bach's chorale style (or any other, provided the correct input) and already fooling
+even musical experts from time to time\cite{hadjeres2016deepbach}.
+Examples for systems: Flow Machines (Sony France), Watson Beat (IBM), Jukedeck (London Startup), CHAMELEON,
+Songsmith (Google), Magenta (Google)
+
+\chapter{The CHAMELEON Harmonising System}
+
+
+%END normal LaTex document
+\newpage
+\bibliographystyle{alpha}
+\bibliography{biblio}
+
+\closing
+\end{document}

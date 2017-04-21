@@ -1,0 +1,1 @@
+python C:\Users\User\Desktop\Bachelors_Thesis\reductions\readAllXMLextractmeasures.py "C:\Users\User\Desktop\Bachelors_Thesis\reductions\input\BachChorales\\" "C:\Users\User\Desktop\Bachelors_Thesis\reductions\measureoffsets\BachChorales\\"

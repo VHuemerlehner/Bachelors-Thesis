@@ -1,0 +1,33 @@
+TS	2/4
+Bar	[0.0]
+Grp	0.0
+Bar	[0.0]
+Bar	[0.0]
+Bar	[0.0]
+Bar	[0.0]
+Bar	[0.0]
+Bar	[0.0]
+Bar	[0.0]
+Bar	[0.0]
+Bar	[0.0]
+Grp	0.0
+Bar	[0.0]
+Bar	[0.0]
+Bar	[0.0]
+Bar	[0.0]
+Bar	[0.0]
+Bar	[0.0]
+Bar	[0.0, 1.0]
+Bar	[0.0]
+Grp	0.0
+Bar	[0.0]
+Bar	[0.0]
+Bar	[0.0]
+Bar	[0.0]
+Grp	0.0
+Bar	[0.0]
+Bar	[0.0]
+Bar	[0.0]
+Bar	[0.0]
+Bar	[0.0, 1.0]
+Bar	[0.0]
