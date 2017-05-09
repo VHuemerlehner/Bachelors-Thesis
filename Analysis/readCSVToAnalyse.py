@@ -12,7 +12,7 @@ import csv;
 import analysis;
 
 rows = [];
-with open('Calalang_Pater_Noster [Checked - Giannos].txt.csv', newline='') as file:
+with open('BC_001_026900B_a1.txt.csv', newline='') as file:
     dialect = csv.Sniffer().sniff(file.read(500));
     file.seek(0);
     reader = csv.reader(file, dialect);
@@ -34,5 +34,5 @@ giant_list = analysis.splitintolists(rows);
 # print(harmonic_rhythm);
 # pattern_comparison = analysis.patcomparison(giant_list[0], giant_list[1]);
 # print('\n\n\nPattern Comparison\n' + str(pattern_comparison));
-# pitch_analysis = analysis.pitchana(giant_list[2]);
-print('\n\n\nPitch Analysis\n' + str(pitch_analysis));
+pitch_analysis = analysis.pitchana(giant_list[2]);
+print('\n\n\nPitch Analysis\n' + str(pitch_analysis))

@@ -1,3 +1,3 @@
-Navigate to Bachelors_Thesis\Analysis
+Navigate to Bachelors_Thesis/Analysis
 
 python readCSVToAnalyse.py

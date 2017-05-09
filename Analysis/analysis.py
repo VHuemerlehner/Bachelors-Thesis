@@ -14,7 +14,7 @@ def smart_find(haystack, needle):
     if haystack.find(" "+needle+" ") != -1:
         return haystack.find(' ' + needle + ' ');
     return -1;
-    
+
 #This function splits the long list of rows of the .csv-files into five
 #separate ones containing information about harmonic rhythm, melodic rhythm,
 #melody pitches, grouping and time signatures. These lists get appended into
@@ -39,7 +39,7 @@ def splitintolists(data):
     tsinf = [];
     tsstring = '';
     grpint = 0;
-    
+
     #Iterating over the entire data
     for i in range(len(data)):
         #If we find a new TS, change the counting variable accordingly
@@ -92,13 +92,13 @@ def splitintolists(data):
         mrinf[i] = list(mrinf[i].split());
         mpinf[i] = list(mpinf[i].split());
 
-#    For debugging:                                 
+#    For debugging:
 #    print('Harmonic Rhythm\n');
 #    print(hrinf);
 #    print('\n\nMelodic Rhythm\n');
 #    print(mrinf);
-#    print('\n\nMelody Pitches\n');
-#    print(mpinf);
+    # print('\n\nMelody Pitches\n');
+    # print(mpinf);
 #    print('\n\nGrouping\n')
 #    print(grpinf);
 #    print('\n\nTime Signatures\n')
@@ -124,7 +124,7 @@ def patfrequency(rpinf):
     rpdict = {};
     patlist = [];
     occurencelist = [];
-    
+
     # Running through the data, make a marker for new or old pattern
     for i in rpinf:
         newTS = True;
@@ -171,13 +171,13 @@ def patcomparison(hr, mr):
                  monsets += 1;
                  if k == l:
                      coocc += 1;
-                     
+
     results.append(coocc);
     results.append(coocc/len(hr));
     results.append(coocc/honsets);
     results.append(coocc/monsets);
     results.append(monsets-honsets);
-    results.append((monsets-honsets)/len(hr));            
+    results.append((monsets-honsets)/len(hr));
     return results;
 
 
@@ -189,40 +189,53 @@ def patcomparison(hr, mr):
 #of harmony changes in the corresponding bar/piece.
 def pitchana(mp):
     results = [];
-    contour = zeros(len(mp));
-    contoursign = zeros(len(mp));
-    contourabs = zeros(len(mp));
+    pitches = [];
+    # First, we need to get all pitches into one long list of integers
+    for i in mp:
+        for j in i:
+            pitches.append(int(j));
+    contour = [None] * (len(pitches)-1);
+    contoursign = [None] * (len(pitches)-1);
+    contourabs = [None] * (len(pitches)-1);
     distanceabs = 0;
+    distancerel = 0;
 
 
 ########### FIND LITERATURE ON THE VALENCE OF INTERVALS
-
+    # then, we could find a "tonal" distance of the melody.
     distancetonal = [];
-    # need to keep our array from running into an out_of_range error, so we add
-    # the same number at the end
-    mp.append(mp[len(mp)-1]);
 
     # Working definition of contour: Distances between adjacent tones. May need
     # to be revised later on! Contoursign extracts only the direction of
     # movement, contourabs only the amount of movement
-    for i in range(len(mp)):
-    	contour[i] = mp[i+1]-mp[i];
-    	if contour[i] > 0:
-    		contoursign[i] = 1;
-    		contourabs[i] = contour[i];
-    	elif contour[i] < 0:
-    		contoursign[i] = -1;
-    		contourabs[i] = -contour[i];
-    	elif contour[i] == 0:
-    		contoursign[i] = 0;
-    		contourabs[i] = 0;
+    # First, we need to get all pitches into one list to iterate through.
+    # ------- IDEA: delete unisons? pro: does not contribute to contour
+    # con: may contribute to harmonic rhythm (harmonically reinterpreted "equal" pitches)
+    for i in range(len(pitches)-1):
+        contour[i] = pitches[i+1]-pitches[i];
+        if contour[i] > 0:
+    	    contoursign[i] = 1;
+    	    contourabs[i] = contour[i];
+        elif contour[i] < 0:
+    	    contoursign[i] = -1;
+    	    contourabs[i] = -contour[i];
+        elif contour[i] == 0:
+    	    contoursign[i] = 0;
+    	    contourabs[i] = 0;
 
     for i in range(len(contourabs)):
     	distanceabs = distanceabs + contourabs[i];
 
+    distancerel = distanceabs/(len(pitches)-1);
+    print(distanceabs);
+    print(distancerel);
+
     # Write everything into the results-handle for return
-	results.append(contour);
-	results.append(contoursign);
-	resluts.append(contourabs);
-	results.append(distanceabs);
-	results.append(distancetonal);
+    results.append(contour);
+    results.append(contourabs);
+    results.append(contoursign);
+    results.append(distanceabs);
+    results.append(distancerel);
+    results.append(distancetonal);
+
+    return results;
