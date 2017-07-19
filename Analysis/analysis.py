@@ -91,18 +91,18 @@ def splitintolists(data):
 		mrinf[i] = list(mrinf[i].split())
 		mpinf[i] = list(mpinf[i].split())
 
-#    For debugging:
-#    print('Harmonic Rhythm\n')
-#    print(hrinf)
-#    print('\n\nMelodic Rhythm\n')
-#    print(mrinf)
+	# # For debugging:
+	# print('Harmonic Rhythm\n')
+	# print(hrinf)
+	# print('\n\nMelodic Rhythm\n')
+	# print(mrinf)
 	# print('\n\nMelody Pitches\n')
 	# print(mpinf)
-#    print('\n\nGrouping\n')
-#    print(grpinf)
-#    print('\n\nTime Signatures\n')
-#    print(tsinf)
-#    print('\n\n\nAre all lists of equal length?\n' + str((len(hrinf) == len(mrinf)) and (len(mpinf) == len(grpinf)) and (len(grpinf) == len(tsinf))))
+	# print('\n\nGrouping\n')
+	# print(grpinf)
+	# print('\n\nTime Signatures\n')
+	# print(tsinf)
+	# print('\n\n\nAre all lists of equal length?\n' + str((len(hrinf) == len(mrinf)) and (len(mpinf) == len(grpinf)) and (len(grpinf) == len(tsinf))))
 
 	#Write it all in one list so we only hand around one object. Like a folder. Just dumb.
 	returnlist = []
@@ -280,17 +280,17 @@ def patcomparison(hr, mr, ts):
 
 		# In the end, divide the pattern's distance measure by its onset count
 		wnbd = distance/number
-		# And add it to the distance-list
+		# And add it to the distance-list once for each note in the pattern
 		for i in range(number):
 			wnbdList.append(wnbd)
 
 
-	results.append(coocc)
-	results.append(coocc/len(hr))
-	results.append(coocc/honsets)
+	# results.append(coocc)
+	# results.append(coocc/len(hr))
+	# results.append(coocc/honsets)
 	results.append(coocc/monsets)
-	results.append(monsets-honsets)
-	results.append((monsets-honsets)/len(hr))
+	# results.append(monsets-honsets)
+	# results.append((monsets-honsets)/len(hr))
 	results.append(wnbdList)
 	return results
 
@@ -468,16 +468,16 @@ def pitchana(mp, hr, mr, ts):
 	# print(intervals_abs_change)
 
 	# Write everything into the results-handle for return
-	results.append(intervals)
+	# results.append(intervals)
 	results.append(intervals_abs)
-	results.append(contour)
+	# results.append(contour)
 	results.append(contourdir)
-	results.append(distanceabs)
-	results.append(distancerel)
-	results.append(interval_counter)
-	results.append(interval_abs_counter)
-	results.append(interval_change_counter)
-	results.append(intervals_abs_change)
+	# results.append(distanceabs)
+	# results.append(distancerel)
+	# results.append(interval_counter)
+	# results.append(interval_abs_counter)
+	# results.append(interval_change_counter)
+	# results.append(intervals_abs_change)
 
 	return results
 
@@ -582,3 +582,6 @@ def probabilities(contour, mr, coocc, intervals, syncopation):
 	stepprob = stepharm / stepcount
 	jumpprob = jumpharm / jumpcount
 	octprob = octharm / octcount
+
+	for i in range(len(syncopation)):
+		pass
