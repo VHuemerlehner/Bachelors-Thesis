@@ -200,90 +200,105 @@ def patcomparison(hr, mr, ts):
 	for i in range(len(mr)):
 		# Write one pattern into a new list
 		onsets = mr[i]
-		# turn list from str into float
-		for m in range(len(onsets)):
-			onsets[m] = float(onsets[m])
-		number = len(onsets)
-		distance = 0
-		# Note down the strong beats of the pattern (may be different each bar,
-		# so we need to do it for each pattern)
-		strong = []
-		# The denominator of the time signature
-		denom = ts[i].split('/')[1]
-		# 0 is always the first strong beat
-		beat = 0
-		# which is then incremented depending on the denominator: Our rhythm
-		# onsets are calculated in fourths, therefore, a denominator of 4 needs
-		# to increment by 1, a denominator of 2 by 2, one of 8 by 0.5 etc.
-		# This is achieved by taking the reciprocal value of denominator/4.
-		incr = 1/(int(denom)/4)
-		# Add strong beats as often as the numerator tells us.
-		for j in range(int(ts[i].split('/')[0])):
-			strong.append(beat)
-			beat += incr
-		# Loop until the last onset in the pattern, which is treated differently
-		for k in range(len(onsets) - 1):
-			if onsets[k] in strong:
+		# In case the bar is empty of melody notes, skip it.
+		if onsets != []:
+
+			# turn list from str into float
+			for m in range(len(onsets)):
+				onsets[m] = float(onsets[m])
+			number = len(onsets)
+			distance = 0
+			# Note down the strong beats of the pattern (may be different each bar,
+			# so we need to do it for each pattern)
+			strong = []
+			# The denominator of the time signature
+			denom = ts[i].split('/')[1]
+			# 0 is always the first strong beat
+			beat = 0
+			# which is then incremented depending on the denominator: Our rhythm
+			# onsets are calculated in fourths, therefore, a denominator of 4 needs
+			# to increment by 1, a denominator of 2 by 2, one of 8 by 0.5 etc.
+			# This is achieved by taking the reciprocal value of denominator/4.
+			incr = 1/(int(denom)/4)
+			# Add strong beats as often as the numerator tells us.
+			for j in range(int(ts[i].split('/')[0])):
+				strong.append(beat)
+				beat += incr
+
+			# Loop until the last onset in the pattern, which is treated differently
+			# Check, if pattern is longer than one beat, else only do the last
+			# onset actions
+			if len(onsets) > 1:
+
+				for k in range(len(onsets) - 1):
+					dtn = 0
+					dtta = 0
+					if onsets[k] in strong:
+						distance += 0
+					else:
+						# distance to next strong beat (no matter the direction):
+						# Minimum of the differences between the onset and all strong
+						# beats, absolute value so direction does not matter
+						dtb = min(abs(onsets[k] - l) for l in strong)
+						# print(dtb)
+						for l in strong:
+							if l > onsets[k]:
+								# distance to the next occurring beat (forwards)
+								dtn = l - onsets[k]
+
+								# Does this even make sense?
+								#Check again.
+								if l != strong[-1]:
+									# distance to two beats ahead
+									dtta = dtn + incr
+								break
+						# If the offbeat note stops between the next two strong beats,
+						# the distance measure added is doubled
+						if ((onsets[k+1] - onsets[k]) > dtn) and ((onsets[k+1] - onsets[k]) <= dtta):
+							distance += 2/dtb
+						else:
+							distance += 1/dtb
+			# treat the last onset differently (assume it ends on the pattern ending)
+			# need to reset distances
+			dtn = 0
+			dtta = 0
+			last_onset = onsets[-1]
+			# if on a strong beat, ignore
+			if last_onset in strong:
 				distance += 0
+			# else assume it ends on the pattern ending (the latest)
 			else:
-				# distance to next strong beat (no matter the direction):
-				# Minimum of the differences between the onset and all strong
-				# beats, absolute value so direction does not matter
-				dtb = min(abs(onsets[k] - l) for l in strong)
+				# get minimal distance to beat
+				dtb = min(last_onset - l for l in strong)
 				# print(dtb)
+				# get distance to following strong beat (if applicable)
+				# MAYBE ADD ONE MORE BEAT TO MEASURE SO THIS BECOMES EASIER?
+				followed = False
 				for l in strong:
-					if l > onsets[k]:
-						# distance to the next occurring beat (forwards)
-						dtn = l - onsets[k]
-						# distance to two beats ahead
+					if l > last_onset:
+						followed = True
+						dtn = l - last_onset
 						dtta = dtn + incr
+						# get the next beat's index (no duplicates, so this works)
+						ind = strong.index(l)
 						break
-				# If the offbeat note stops between the next two strong beats,
-				# the distance measure added is doubled
-				if ((onsets[k+1] - onsets[k]) > dtn) and ((onsets[k+1] - onsets[k]) <= dtta):
-					distance += 2/dtb
+				# If the pattern ending is between 1 and 2 beats after the onset,
+				# double the distance measure.
+				if followed:
+					if (ind == len(strong) - 1):
+						distance += 2/dtb
+					else:
+						distance += 1/dtb
 				else:
 					distance += 1/dtb
-		# treat the last onset differently (assume it ends on the pattern ending)
-		# need to reset distances
-		dtn = 0
-		dtta = 0
-		last_onset = onsets[-1]
-		# if on a strong beat, ignore
-		if last_onset in strong:
-			distance += 0
-		# else assume it ends on the pattern ending (the latest)
+
+			# In the end, divide the pattern's distance measure by its onset count
+			wnbd = distance/number
+			# And add it to the distance-list once for each note in the pattern
+			for i in range(number):
+				wnbdList.append(wnbd)
 		else:
-			# get minimal distance to beat
-			dtb = min(last_onset - l for l in strong)
-			# print(dtb)
-			# get distance to following strong beat (if applicable)
-			# MAYBE ADD ONE MORE BEAT TO MEASURE SO THIS BECOMES EASIER?
-			followed = False
-			for l in strong:
-				if l > last_onset:
-					followed = True
-					dtn = l - last_onset
-					dtta = dtn + incr
-					# get the next beat's index (no duplicates, so this works)
-					ind = strong.index(l)
-					break
-			# If the pattern ending is between 1 and 2 beats after the onset,
-			# double the distance measure.
-			if followed:
-				if (ind == len(strong) - 1):
-					distance += 2/dtb
-				else:
-					distance += 1/dtb
-			else:
-				distance += 1/dtb
-
-		# In the end, divide the pattern's distance measure by its onset count
-		wnbd = distance/number
-		# And add it to the distance-list once for each note in the pattern
-		for i in range(number):
-			wnbdList.append(wnbd)
-
+			pass
 
 	# results.append(coocc)
 	# results.append(coocc/len(hr))
@@ -367,10 +382,6 @@ def pitchana(mp, hr, mr, ts):
 	# extracts only the direction of
 	# movement, intervals_abs only the amount of movement
 	# First, we need to get all pitches into one list to iterate through.
-	# ------- IDEA: delete unisons? pro: does not contribute to contour
-	# con: may contribute to harmonic rhythm (harmonically reinterpreted
-	# "equal" pitches) -- Check how often unisons are harmonically reinterpreted
-	# to see if deleting them is a problem or not.
 	for i in range(len(pitches)-1):
 		# definition of an interval applied: the distance between two adjacent
 		# pitches

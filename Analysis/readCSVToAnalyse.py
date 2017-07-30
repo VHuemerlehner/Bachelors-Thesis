@@ -22,11 +22,12 @@ currFolder = sys.argv[1]
 destFolder = sys.argv[2]
 
 os.chdir(currFolder)
-print(currFolder)
 allDocs = glob.glob("*.csv")
 
 if len(allDocs) < 1:
 	sys.exit("readCSVToAnalyse.py: No CSV files there!")
+
+sync = []
 
 for pieceName in allDocs:
 	print('Analysing piece: ' + pieceName + '...')
@@ -46,7 +47,7 @@ for pieceName in allDocs:
 			rows.append(row)
 
 	giant_list = analysis.splitintolists(rows)
-	
+
 	#giant_list contains hr, mr, mp, grp, ts in chronological lists
 	# harmonic_rhythm = analysis.patfrequency(giant_list[0])
 	# melodic_rhythm = analysis.patfrequency(giant_list[1])
@@ -56,9 +57,11 @@ for pieceName in allDocs:
 	# print(giant_list[4])
 	# print('Harmonic Rhythm\n')
 	# print(harmonic_rhythm)
-	# pattern_comparison = analysis.patcomparison(giant_list[0], giant_list[1], giant_list[4])
+	pattern_comparison = analysis.patcomparison(giant_list[0], giant_list[1], giant_list[4])
 	# print('\n\n\nPattern Comparison\n' + str(pattern_comparison))
 	pitch_analysis = analysis.pitchana(giant_list[2], giant_list[0], giant_list[1], giant_list[4])
+
+	sync.append(pattern_comparison[1])
 
 	print('Writing into file...')
 	#file management, open file
@@ -68,6 +71,10 @@ for pieceName in allDocs:
 	text_file = open(finalName, 'w')
 
 	#write file
-	text_file.write(str(pitch_analysis))
+	text_file.write(str(pitch_analysis) + '\n' + str(pattern_comparison))
 	text_file.close()
 	os.rename(currFolder+finalName, destFolder+finalName)
+
+file = open('/home/waldo/Desktop/Bachelors_Thesis/Analysis/Output/Syncopation/' + 'Tango.txt', 'w')
+file.write(str(sync))
+file.close()
