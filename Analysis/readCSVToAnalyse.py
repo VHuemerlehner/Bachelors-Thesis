@@ -12,8 +12,6 @@ import sys
 import os
 import glob
 
-# BC_001_026900B_a1.txt.csv
-# Calalang_Pater_Noster [Checked - Giannos].txt.csv
 
 if len(sys.argv) < 3:
 	sys.exit("readCSVToAnalyse.py: Not enough input arguments")
@@ -27,7 +25,8 @@ allDocs = glob.glob("*.csv")
 if len(allDocs) < 1:
 	sys.exit("readCSVToAnalyse.py: No CSV files there!")
 
-sync = []
+# For calculating syncopation thresholds only
+# sync = []
 
 for pieceName in allDocs:
 	print('Analysing piece: ' + pieceName + '...')
@@ -61,7 +60,11 @@ for pieceName in allDocs:
 	# print('\n\n\nPattern Comparison\n' + str(pattern_comparison))
 	pitch_analysis = analysis.pitchana(giant_list[2], giant_list[0], giant_list[1], giant_list[4])
 
-	sync.append(pattern_comparison[1])
+	# For calculating syncopation thresholds only
+	# sync.append(pattern_comparison[1])
+	probabilities = analysis.probabilities(pitch_analysis[0], pitch_analysis[1],\
+	pattern_comparison[0], pattern_comparison[1], giant_list[0], giant_list[1],\
+	giant_list[4])
 
 	print('Writing into file...')
 	#file management, open file
@@ -71,10 +74,12 @@ for pieceName in allDocs:
 	text_file = open(finalName, 'w')
 
 	#write file
-	text_file.write(str(pitch_analysis) + '\n' + str(pattern_comparison))
+	text_file.write(str(probabilities) + '\n' + str(len(giant_list[1])))
 	text_file.close()
 	os.rename(currFolder+finalName, destFolder+finalName)
 
-file = open('/home/waldo/Desktop/Bachelors_Thesis/Analysis/Output/Syncopation/' + 'Tango.txt', 'w')
-file.write(str(sync))
-file.close()
+
+# For debugging and finding syncopation thresholds
+# file = open('/home/waldo/Desktop/Bachelors_Thesis/Analysis/Output/Syncopation/' + 'Rebetika.txt', 'w')
+# file.write(str(sync))
+# file.close()

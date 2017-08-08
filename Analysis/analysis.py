@@ -5,6 +5,8 @@
 #TODO: Rewrite documentation
 #Helper function to find word in string:
 
+import numpy as np
+
 def smart_find(haystack, needle):
 	if haystack.startswith(needle+" "):
 		return 0
@@ -269,10 +271,9 @@ def patcomparison(hr, mr, ts):
 			# else assume it ends on the pattern ending (the latest)
 			else:
 				# get minimal distance to beat
-				dtb = min(last_onset - l for l in strong)
+				dtb = min(abs(last_onset - l) for l in strong)
 				# print(dtb)
 				# get distance to following strong beat (if applicable)
-				# MAYBE ADD ONE MORE BEAT TO MEASURE SO THIS BECOMES EASIER?
 				followed = False
 				for l in strong:
 					if l > last_onset:
@@ -285,7 +286,7 @@ def patcomparison(hr, mr, ts):
 				# If the pattern ending is between 1 and 2 beats after the onset,
 				# double the distance measure.
 				if followed:
-					if (ind == len(strong) - 1):
+					if (ind <= len(strong) - 1):
 						distance += 2/dtb
 					else:
 						distance += 1/dtb
@@ -506,11 +507,10 @@ def pitchana(mp, hr, mr, ts):
 # The functions takes 4 lists and returns a 2 x 9 matrix, containing the
 # conditional probabilities of a harmonic onset on:
 # a contour change; a melody onset; unisons; steps; jumps; jumps bigger than or
-# equal to an octave; low syncopation (threshold? maybe so that each category gets roughly one third of the values); medium syncopation;
-# high syncopation.
+# equal to an octave; low syncopation; medium syncopation; high syncopation.
 
 
-def probabilities(contour, mr, coocc, intervals, syncopation):
+def probabilities(intervals, contour, coocc, syncopation, hr, mr, ts):
 	# Get all melody and harmony offsets into one list, not list of lists
 	offsets = []
 	hr_offsets = []
@@ -524,6 +524,7 @@ def probabilities(contour, mr, coocc, intervals, syncopation):
 	#Restore actual timings for melodic rhythm by adding the numerator of the
 	#TS for each bar to the offsets (hacky solution, but that's what you get for
 	#not thinking projects through in the beginning...)
+	bar_count = 0
 	for i in range(len(offsets)-1):
 		if offsets[i+1] <= offsets[i]:
 			for j in range(i+1, len(offsets)):
@@ -589,10 +590,52 @@ def probabilities(contour, mr, coocc, intervals, syncopation):
 
 	# Conditional probabilities are then easily calculated by dividing the
 	# cooccurence counter by the overall category counter.
-	uniprob = uniharm / unicount
-	stepprob = stepharm / stepcount
-	jumpprob = jumpharm / jumpcount
-	octprob = octharm / octcount
+	if unicount != 0:
+		uniprob = uniharm / unicount
+	else: uniprob = 0
+	if stepcount != 0:
+		stepprob = stepharm / stepcount
+	else: stepcount = 0
+	if jumpcount != 0:
+		jumpprob = jumpharm / jumpcount
+	else: jumpprob = 0
+	if octcount != 0:
+		octprob = octharm / octcount
+	else: octprob = 0
+
+
+	low_sync = 0
+	med_sync = 0
+	high_sync = 0
+	lowharm = 0
+	medharm = 0
+	highharm = 0
 
 	for i in range(len(syncopation)):
-		pass
+		if syncopation[i] <= 0.5:
+			low_sync += 1
+			if offsets[i] in hr_offsets:
+				lowharm += 1
+		elif syncopation[i] <= 1:
+			med_sync += 1
+			if offsets[i] in hr_offsets:
+				medharm += 1
+		else:
+			high_sync += 1
+			if offsets[i] in hr_offsets:
+				highharm += 1
+	if low_sync != 0:
+		lowprob = lowharm / low_sync
+	else: lowprob = 0
+	if med_sync != 0:
+		medprob = medharm / med_sync
+	else: medprob = 0
+	if high_sync != 0:
+		highprob = highharm/high_sync
+	else: highprob = 0
+
+	results = np.array([[contprob, coocc, uniprob, stepprob, jumpprob, octprob,\
+	lowprob, medprob, highprob], [1-contprob, 1-coocc, 1-uniprob, 1-stepprob,\
+	1-jumpprob, 1-octprob, 1-lowprob, 1-medprob, 1-highprob]])
+
+	return results
