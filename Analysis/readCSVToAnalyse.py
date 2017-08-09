@@ -11,6 +11,7 @@ import analysis
 import sys
 import os
 import glob
+import numpy as np
 
 
 if len(sys.argv) < 3:
@@ -27,6 +28,10 @@ if len(allDocs) < 1:
 
 # For calculating syncopation thresholds only
 # sync = []
+
+#counting variables TODO: documentation
+all_mr = 0
+all_probs = np.zeros((2,9))
 
 for pieceName in allDocs:
 	print('Analysing piece: ' + pieceName + '...')
@@ -66,7 +71,17 @@ for pieceName in allDocs:
 	pattern_comparison[0], pattern_comparison[1], giant_list[0], giant_list[1],\
 	giant_list[4])
 
-	print('Writing into file...')
+	# Get the probabilities for the entire idiom by weighting each pieces'
+	# probabilities according to melody onsets and then averaging.
+
+	offcount = len(giant_list[1])
+
+	weighted_probs = probabilities * offcount
+
+	all_probs = np.add(weighted_probs, all_probs)
+
+	all_mr += offcount
+
 	#file management, open file
 	splitName = pieceName.split('.')
 	noExtName = splitName[0]
@@ -78,6 +93,14 @@ for pieceName in allDocs:
 	text_file.close()
 	os.rename(currFolder+finalName, destFolder+finalName)
 
+# 2X9 matrix with probabilities for one idiom
+idiom_probs = all_probs / all_mr
+
+# write file
+print('Writing idiom file')
+file = open('/home/waldo/Desktop/Bachelors_Thesis/Analysis/Probabilities/Idioms/' + 'Tango.txt', 'w')
+file.write(str(idiom_probs))
+file.close()
 
 # For debugging and finding syncopation thresholds
 # file = open('/home/waldo/Desktop/Bachelors_Thesis/Analysis/Output/Syncopation/' + 'Rebetika.txt', 'w')
