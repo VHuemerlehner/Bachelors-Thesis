@@ -7,14 +7,16 @@
 
 import numpy as np
 
-def smart_find(haystack, needle):
-	if haystack.startswith(needle+" "):
-		return 0
-	if haystack.endswith(" "+needle):
-		return len(haystack)
-	if haystack.find(" "+needle+" ") != -1:
-		return haystack.find(' ' + needle + ' ')
-	return -1
+
+#NEVER USED; DELETE
+# def smart_find(haystack, needle):
+# 	if haystack.startswith(needle+" "):
+# 		return 0
+# 	if haystack.endswith(" "+needle):
+# 		return len(haystack)
+# 	if haystack.find(" "+needle+" ") != -1:
+# 		return haystack.find(' ' + needle + ' ')
+# 	return -1
 
 #This function splits the long list of rows of the .csv-files into five
 #separate ones containing information about harmonic rhythm, melodic rhythm,
@@ -119,37 +121,39 @@ def splitintolists(data):
 #-------------------------------------------------------------------------------
 
 
-# The following function sums over a list of given rhythmic patterns to
-# determine the frequency of each occuring pattern. It outputs a dictionary
-# with 'pattern: [sum, frequency]'.
-def patfrequency(rpinf):
-	# Initialising variables: 2 lists for patterns and occurences and the dict
-	# to put it all in
-	rpdict = {}
-	patlist = []
-	occurencelist = []
-
-	# Running through the data, make a marker for new or old pattern
-	for i in rpinf:
-		newTS = True
-		for j in patlist:
-			if i == j:
-				newTS = False
-		# If the pattern is new, add it to the list and add an occurence entry
-		if newTS:
-			patlist.append(i)
-			occurencelist.append(1)
-		# Else find it in the list and edit the corresponding occurence entry
-		else:
-			k = 0
-			while (i != patlist[k]) and (k<len(patlist)):
-				k += 1
-			occurencelist[k] += 1
-
-	# Write it all into the dict
-	for i in range(len(patlist)):
-		rpdict.update({tuple(patlist[i]): [occurencelist[i], occurencelist[i]/len(rpinf)]})
-	return rpdict
+# NEVER USED?! DELETE
+#
+# # The following function sums over a list of given rhythmic patterns to
+# # determine the frequency of each occuring pattern. It outputs a dictionary
+# # with 'pattern: [sum, frequency]'.
+# def patfrequency(rpinf):
+# 	# Initialising variables: 2 lists for patterns and occurences and the dict
+# 	# to put it all in
+# 	rpdict = {}
+# 	patlist = []
+# 	occurencelist = []
+#
+# 	# Running through the data, make a marker for new or old pattern
+# 	for i in rpinf:
+# 		newTS = True
+# 		for j in patlist:
+# 			if i == j:
+# 				newTS = False
+# 		# If the pattern is new, add it to the list and add an occurence entry
+# 		if newTS:
+# 			patlist.append(i)
+# 			occurencelist.append(1)
+# 		# Else find it in the list and edit the corresponding occurence entry
+# 		else:
+# 			k = 0
+# 			while (i != patlist[k]) and (k<len(patlist)):
+# 				k += 1
+# 			occurencelist[k] += 1
+#
+# 	# Write it all into the dict
+# 	for i in range(len(patlist)):
+# 		rpdict.update({tuple(patlist[i]): [occurencelist[i], occurencelist[i]/len(rpinf)]})
+# 	return rpdict
 
 
 #-------------------------------------------------------------------------------
@@ -480,7 +484,6 @@ def pitchana(mp, hr, mr, ts):
 	# print(intervals_abs_change)
 
 	# Write everything into the results-handle for return
-	# results.append(intervals)
 	results.append(intervals_abs)
 	# results.append(contour)
 	results.append(contourdir)
@@ -501,11 +504,12 @@ def pitchana(mp, hr, mr, ts):
 # depend, i.e. intervals, contour, syncopation and overall melody onsets. For all
 # of these but the syncopation measure, this is straight forward, for the
 # syncopation measure, the list is split into patterns already. A problem about
-# this is that the window should actually be of different sizes
-# this would however require a deep understanding
+# this is that the window should actually be of different sizes.
+# This would however require a deep understanding
 # of the musical score on the system's side and is thus not feasible.
 # The functions takes 4 lists and returns a 2 x 9 matrix, containing the
-# conditional probabilities of a harmonic onset on:
+# conditional probabilities (and their counterprobabilities) of a harmonic onset
+# on:
 # a contour change; a melody onset; unisons; steps; jumps; jumps bigger than or
 # equal to an octave; low syncopation; medium syncopation; high syncopation.
 
