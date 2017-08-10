@@ -387,14 +387,17 @@ def pitchana(mp, hr, mr, ts):
 	# extracts only the direction of
 	# movement, intervals_abs only the amount of movement
 	# First, we need to get all pitches into one list to iterate through.
+	# The first interval is always 0, since there is no movement to be found.
+	intervals[0] = 0
 	for i in range(len(pitches)-1):
 		# definition of an interval applied: the distance between two adjacent
 		# pitches
-		intervals[i] = pitches[i+1]-pitches[i]
+		intervals[i+1] = pitches[i+1]-pitches[i]
 		# Different cases: Upwards interval
 		# Contour and absolute intervals are denoted, and the counters for
 		# each interval size are adjusted. Usage of separate counters for up-
 		# and downwards motion is justified so as to make indexing easier.
+	for i in range(len(intervals)):
 		if intervals[i] > 0:
 			contour[i] = 1
 			intervals_abs[i] = intervals[i]
