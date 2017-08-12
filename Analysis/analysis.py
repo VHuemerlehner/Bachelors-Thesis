@@ -325,45 +325,75 @@ def patcomparison(hr, mr, ts):
 def pitchana(mp, hr, mr, ts):
 	results = []
 	pitches = []
-	offsets = []
-	hr_offsets = []
-	# First, we need to get all pitches into one long list of integers, same
-	# with their offsets and the harmonic rhythm offsets, those as floats
-	# because they contain .5 values and we actually do maths on them
+	# offsets = []
+	# hr_offsets = []
+	# # First, we need to get all pitches into one long list of integers, same
+	# # with their offsets and the harmonic rhythm offsets, those as floats
+	# # because they contain .5 values and we actually do maths on them
 	for i in mp:
 		for j in i:
 			pitches.append(int(j))
+	# for i in mr:
+	# 	for j in i:
+	# 		offsets.append(float(j))
+	# for i in hr:
+	# 	for j in i:
+	# 		hr_offsets.append(float(j))
+	#
+	# #Restore actual timings for melodic rhythm by adding the numerator of the
+	# #TS for each bar to the offsets (hacky solution, but that's what you get for
+	# #not thinking projects through in the beginning...)
+	# bar_count = 0
+	# for i in range(len(offsets)-1):
+	# 	if offsets[i+1] <= offsets[i]:
+	# 		for j in range(i+1, len(offsets)):
+	# 			#Not as complicated as it seems: TS are stored as strings that
+	# 			#we now split at "/" and divide the numerator by the denominator,
+	# 			#then casting as integers and multiplying with 4 since our timings
+	# 			#are thought in 4ths
+	# 			offsets[j] += (int(ts[bar_count].split('/')[0])/int(ts[bar_count].split('/')[1]))*4
+	# 		bar_count += 1
+	#
+	# #Same bs for harmonic rhythm.
+	# bar_count = 0
+	# for i in range(len(hr_offsets)-1):
+	# 	if hr_offsets[i+1] <= hr_offsets[i]:
+	# 		for j in range(i+1, len(hr_offsets)):
+	# 			hr_offsets[j] += (int(ts[bar_count].split('/')[0])/int(ts[bar_count].split('/')[1]))*4
+	#
+	# if offsets[0] != 0:
+	# 	for k in range(len(offsets)):
+	# 		offsets[k] -= offsets[0]
+
+	offsets = []
+	hr_offsets = []
+	possible = []
+	bar_count = 0
+	addendum = 0
 	for i in mr:
+		addendum += (int(ts[bar_count].split('/')[0])/int(ts[bar_count].split('/')[1]))*4
 		for j in i:
-			offsets.append(float(j))
+			m = float(j) + addendum
+			offsets.append(float(m))
+		bar_count += 1
+
+	addendum = 0
+	bar_count = 0
 	for i in hr:
+		addendum += (int(ts[bar_count].split('/')[0])/int(ts[bar_count].split('/')[1]))*4
 		for j in i:
-			hr_offsets.append(float(j))
+			m = float(j) + addendum
+			hr_offsets.append(float(m))
+		bar_count += 1
 
-	#Restore actual timings for melodic rhythm by adding the numerator of the
-	#TS for each bar to the offsets (hacky solution, but that's what you get for
-	#not thinking projects through in the beginning...)
-	bar_count = 0
-	for i in range(len(offsets)-1):
-		if offsets[i+1] <= offsets[i]:
-			for j in range(i+1, len(offsets)):
-				#Not as complicated as it seems: TS are stored as strings that
-				#we now split at "/" and divide the numerator by the denominator,
-				#then casting as integers and multiplying with 4 since our timings
-				#are thought in 4ths
-				offsets[j] += (int(ts[bar_count].split('/')[0])/int(ts[bar_count].split('/')[1]))*4
-			bar_count += 1
+	if offsets[0] != 0:
+		subtractor = offsets[0]
+		for k in range(len(offsets)):
+			offsets[k] -= subtractor
 
-	#Same bs for harmonic rhythm.
-	bar_count = 0
-	for i in range(len(hr_offsets)-1):
-		if hr_offsets[i+1] <= hr_offsets[i]:
-			for j in range(i+1, len(hr_offsets)):
-				hr_offsets[j] += (int(ts[bar_count].split('/')[0])/int(ts[bar_count].split('/')[1]))*4
-
-	intervals = [None] * (len(pitches)-1)
-	contour = [None] * (len(pitches)-1)
-	intervals_abs = [None] * (len(pitches)-1)
+	intervals = [None] * (len(pitches))
+	contour = [None] * (len(pitches))
+	intervals_abs = [None] * (len(pitches))
 	distanceabs = 0
 	distancerel = 0
 
@@ -519,35 +549,72 @@ def pitchana(mp, hr, mr, ts):
 
 def probabilities(intervals, contour, coocc, syncopation, hr, mr, ts):
 	# Get all melody and harmony offsets into one list, not list of lists
+	# offsets = []
+	# hr_offsets = []
+	# for i in mr:
+	# 	for j in i:
+	# 		offsets.append(float(j))
+	# for i in hr:
+	# 	for j in i:
+	# 		hr_offsets.append(float(j))
+	#
+	# #Restore actual timings for melodic rhythm by adding the numerator of the
+	# #TS for each bar to the offsets (hacky solution, but that's what you get for
+	# #not thinking projects through in the beginning...)
+	# bar_count = 0
+	#
+	# # Some pieces begin not at the beginning of a bar, therefore raising the
+	# # need to take off the corresponding timing to get absolute timings (we
+	# # still want to start with 0)
+	#
+	# if offsets[0] != 0:
+	# 	for k in range(len(offsets)):
+	# 		offsets[k] -= offsets[0]
+	#
+	#
+	# # Now iterate through the offsets and do what was described earlier.
+	# for i in range(len(offsets)-1):
+	# 	if offsets[i+1] <= offsets[i]:
+	# 		for j in range(i+1, len(offsets)):
+	# 			#Not as complicated as it seems: TS are stored as strings that
+	# 			#we now split at "/" and divide the numerator by the denominator,
+	# 			#then casting as integers and multiplying with 4 since our timings
+	# 			#are thought in 4ths
+	# 			offsets[j] += (int(ts[bar_count].split('/')[0])/int(ts[bar_count].split('/')[1]))*4
+	# 		bar_count += 1
+	#
+	# #Same bs for harmonic rhythm.
+	# bar_count = 0
+	# for i in range(len(hr_offsets)-1):
+	# 	if hr_offsets[i+1] <= hr_offsets[i]:
+	# 		for j in range(i+1, len(hr_offsets)):
+	# 			hr_offsets[j] += (int(ts[bar_count].split('/')[0])/int(ts[bar_count].split('/')[1]))*4
+	# 		bar_count += 1
 	offsets = []
 	hr_offsets = []
+	possible = []
+	bar_count = 0
+	addendum = 0
 	for i in mr:
+		addendum += (int(ts[bar_count].split('/')[0])/int(ts[bar_count].split('/')[1]))*4
 		for j in i:
-			offsets.append(float(j))
+			m = float(j) + addendum
+			offsets.append(float(m))
+		bar_count += 1
+
+	addendum = 0
+	bar_count = 0
 	for i in hr:
+		addendum += (int(ts[bar_count].split('/')[0])/int(ts[bar_count].split('/')[1]))*4
 		for j in i:
-			hr_offsets.append(float(j))
+			m = float(j) + addendum
+			hr_offsets.append(float(m))
+		bar_count += 1
 
-	#Restore actual timings for melodic rhythm by adding the numerator of the
-	#TS for each bar to the offsets (hacky solution, but that's what you get for
-	#not thinking projects through in the beginning...)
-	bar_count = 0
-	for i in range(len(offsets)-1):
-		if offsets[i+1] <= offsets[i]:
-			for j in range(i+1, len(offsets)):
-				#Not as complicated as it seems: TS are stored as strings that
-				#we now split at "/" and divide the numerator by the denominator,
-				#then casting as integers and multiplying with 4 since our timings
-				#are thought in 4ths
-				offsets[j] += (int(ts[bar_count].split('/')[0])/int(ts[bar_count].split('/')[1]))*4
-			bar_count += 1
-
-	#Same bs for harmonic rhythm.
-	bar_count = 0
-	for i in range(len(hr_offsets)-1):
-		if hr_offsets[i+1] <= hr_offsets[i]:
-			for j in range(i+1, len(hr_offsets)):
-				hr_offsets[j] += (int(ts[bar_count].split('/')[0])/int(ts[bar_count].split('/')[1]))*4
+	if offsets[0] != 0:
+		subtractor = offsets[0]
+		for k in range(len(offsets)):
+			offsets[k] -= subtractor
 
 	# Counting variables
 	counter = 0

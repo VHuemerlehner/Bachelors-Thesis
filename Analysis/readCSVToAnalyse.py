@@ -33,6 +33,18 @@ if len(allDocs) < 1:
 all_mr = 0
 all_probs = np.zeros((2,9))
 
+
+
+###Idea: take grouping info to calculate number of bars.
+def getMROffsets(mr, rows):
+	for i in range(len(mr)):
+
+
+
+
+def getHROffsets(hr):
+
+
 for pieceName in allDocs:
 	print('Analysing piece: ' + pieceName + '...')
 	rows = []
@@ -55,14 +67,7 @@ for pieceName in allDocs:
 	#giant_list contains hr, mr, mp, grp, ts in chronological lists
 	# harmonic_rhythm = analysis.patfrequency(giant_list[0])
 	# melodic_rhythm = analysis.patfrequency(giant_list[1])
-	# print('Melodic Rhythm')
-	# print(giant_list[1])
-	# print('Time Signatures')
-	# print(giant_list[4])
-	# print('Harmonic Rhythm\n')
-	# print(harmonic_rhythm)
 	pattern_comparison = analysis.patcomparison(giant_list[0], giant_list[1], giant_list[4])
-	# print('\n\n\nPattern Comparison\n' + str(pattern_comparison))
 	pitch_analysis = analysis.pitchana(giant_list[2], giant_list[0], giant_list[1], giant_list[4])
 
 	# For calculating syncopation thresholds only
