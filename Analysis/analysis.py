@@ -85,37 +85,6 @@ def splitintolists(data):
 					grpint = 1
 			grpinf.append(grpint)
 
-	# First time signature
-	tsn = int(data[0][1].split('/')[0])
-	tsd = int(data[0][1].split('/')[1])
-	if data[1][0] == 'Grp':
-		grp = data[1][1]
-		for j in range(2, len(data)):
-			if data[j][0] == 'Bar':
-				if type(data[j][1]) == list:
-					for k in range(len(data[j][1])):
-						data[j][1][k] += grp
-				elif type(data[j][1]) == int:
-					data[j][1] += grp
-	elif data[2][0] == 'Grp':
-		for j in range(3, len(data)):
-			if data[j][0] == 'Bar':
-				if type(data[j][1]) == list:
-					for k in range(len(data[j][1])):
-						data[j][1][k] += 4*(tsn/tsd)
-				elif type(data[j][1]) == int:
-					data[j][1] += 4*(tsn/tsd)
-	
-
-
-	for i in range(2, len(data)):
-		# Time Signature numerator and denominator
-		if data[i][0] == 'TS':
-			tsn = int(data[i][1].split('/')[0])
-			tsn = int(data[i][1].split('/')[1])
-		elif data[i][0] == 'Grp':
-
-
 	#Convert hrinf, mrinf and mpinf from string to tuple of 'floats':
 	#Find all one-letter words (=integers) in hrinf and add '.0' behind them.
 	for i in range(len(hrinf)):

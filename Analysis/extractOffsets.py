@@ -18,11 +18,17 @@ allDocs = glob.glob("*.xml")
 if len(allDocs) < 1:
 	sys.exit("readAllXMLfiles.py: No XML files there!")
 
+def isfloat(value):
+	try:
+		float(value)
+		return True
+	except ValueError:
+		return False
+
 # parse all pieces
 for pieceName in allDocs:
 	print ("Parsing piece: "+pieceName+"... ");
 	p = converter.parse(currFolder+pieceName);
-	print ("DONE");
 	print ("Writing "+pieceName+" to file...");
 
 	# Get parts
@@ -56,13 +62,32 @@ for pieceName in allDocs:
 
 	# Get Melody offsets
 	for i in mel:
-		off.append(i.offset);
+		if isfloat(i.offset):
+			off.append(float(i.offset));
+		else:
+			tmp = i.offset.split('/')
+			num = tmp[0][-1]
+			den = tmp[1][0]
+			off.append(float(num)/float(den))
 
 	# Get Harmony offsets, make set (remove duplicates), sort
 	for i in red0:
-		off0.append(i.offset);
+		if isfloat(i.offset):
+			off0.append(float(i.offset));
+		else:
+			tmp = i.offset.split('/')
+			num = tmp[0][-1]
+			den = tmp[1][0]
+			off0.append(float(num)/float(den))
+
 	for i in red1:
-		off1.append(i.offset);
+		if isfloat(i.offset):
+			off1.append(float(i.offset));
+		else:
+			tmp = i.offset.split('/')
+			num = tmp[0][-1]
+			den = tmp[1][0]
+			off1.append(float(num)/float(den))
 	hoff = sorted(set(off0 + off1));
 
 	# Put into string
@@ -77,5 +102,3 @@ for pieceName in allDocs:
 	#write file
 	text_file.write(tmpStr)
 	text_file.close()
-
-	print ("DONE");

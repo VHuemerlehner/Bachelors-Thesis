@@ -7,6 +7,9 @@ import sys
 sys.path.insert(0, '/home/waldo/Desktop/Bachelors_Thesis/Analysis')
 import analysis as a
 
+if len(sys.argv) != 5:
+	sys.exit('Prediction.py: I need exactly 5 input arguments (myself, a musicXML, its conditional probabilities, its exact offsets and a target file')
+
 print('Creating prediction for ' + sys.argv[1])
 # Read in the probabilities: Get the string and put it into a format such that
 # only numbers and colons remain, then split at the colons to get a list
@@ -16,10 +19,13 @@ probs_str = probs_file.read()
 probs_str = probs_str.replace('\n', '')
 probs_str = probs_str.replace('  ', ' ')
 probs_str = probs_str.replace('  ', ' ')
-probs_str = probs_str.replace(' ', ',')
-probs_str = probs_str.replace('[,', '[')
+probs_str = probs_str.replace('[ ', '[')
 probs_str = probs_str.replace('[', '')
 probs_str = probs_str.replace(']', '')
+probs_str = probs_str.replace(' ', ',')
+probs_str = probs_str.replace(',,', ',')
+if probs_str[-1].isdigit() == False:
+	probs_str = probs_str[:-1]
 probs_list = probs_str.split(',')
 
 # Transforming strings into floats
@@ -30,6 +36,17 @@ for i in range(len(probs_list)):
 probs = np.array(probs_list)
 probs = probs.reshape(2,9)
 probs_file.close()
+
+offsets = []
+hr_offsets = []
+# Read in the offsets
+off_file = open(sys.argv[3], 'r')
+off_str = off_file.read()
+off_str = off_str.split('\n')
+for i in off_str[0][1:-1].split(','):
+	offsets.append(float(i))
+for i in off_str[1][1:-1].split(','):
+	hr_offsets.append(float(i))
 
 # Read in the music XML for which we want a new prediction
 rows = []
@@ -72,65 +89,8 @@ contour = pitchanalysis[1]
 #Give likelihoods to all mr's, then choose the highest ones until percentage is
 #reached.
 
-# First, we need to restore actual timings, see also analysis
-############ BIG CHANGE TO MAKE!
-offsets = []
-hr_offsets = []
-possible = []
-bar_count = 0
-addendum = 0
-for i in mr:
-	addendum += (int(ts[bar_count].split('/')[0])/int(ts[bar_count].split('/')[1]))*4
-	for j in i:
-		m = float(j) + addendum
-		offsets.append(float(m))
-	bar_count += 1
-
-addendum = 0
-bar_count = 0
-for i in hr:
-	addendum += (int(ts[bar_count].split('/')[0])/int(ts[bar_count].split('/')[1]))*4
-	for j in i:
-		m = float(j) + addendum
-		hr_offsets.append(float(m))
-	bar_count += 1
-
-if offsets[0] != 0:
-	subtractor = offsets[0]
-	for k in range(len(offsets)):
-		offsets[k] -= subtractor
-
-# #Restore actual timings for melodic rhythm by adding the numerator of the
-# #TS for each bar to the offsets (hacky solution, but that's what you get for
-# #not thinking projects through in the beginning...)
-# bar_count = 0
-# for i in range(len(offsets)-1):
-# 	if offsets[i+1] <= offsets[i]:
-# 		for j in range(i+1, len(offsets)):
-# 			#Not as complicated as it seems: TS are stored as strings that
-# 			#we now split at "/" and divide the numerator by the denominator,
-# 			#then casting as integers and multiplying with 4 since our timings
-# 			#are thought in 4ths
-# 			offsets[j] += (int(ts[bar_count].split('/')[0])/int(ts[bar_count].split('/')[1]))*4
-# 		bar_count += 1
-#
-# #Same bs for harmonic rhythm.
-# bar_count = 0
-# for i in range(len(hr_offsets)-1):
-# 	if hr_offsets[i+1] <= hr_offsets[i]:
-# 		for j in range(i+1, len(hr_offsets)):
-# 			hr_offsets[j] += (int(ts[bar_count].split('/')[0])/int(ts[bar_count].split('/')[1]))*4
-# 		bar_count += 1
-
-print(offsets)
-# print(hr)
-# print(mr)
-# print(hr_offsets)
-# print(offsets)
-
 # ####a contour change; a melody onset; unisons; steps; jumps; jumps bigger than or
 # ####equal to an octave; low syncopation; medium syncopation; high syncopation.
-
 likelihood = [None] * len(offsets)
 
 # Sum the probabilities for each melody onset and all strong beats, and get the
@@ -165,14 +125,37 @@ for i in range(len(offsets)):
 	#average
 	likelihood[i] = summedprobs / 3
 
-# Number of harmonies we want to set
-target = int(len(offsets) * probs[0,1])
+# Create a copy so we don't lose the old info
+offsetcopy = list(offsets)
 
-likelihood = np.array(likelihood)
+# Add strong beats, if not yet in there
+for i in range(int(offsets[-1])):
+	if i not in offsets:
+		offsets.append
+
+# Sort the new list
+offsets = sorted(offsets)
+
+# Initialise longer likelihood list
+longlikelihood = [None] * len(offsets)
+
+# Copy old values, for new ones, assign the probability given the absence of
+# a melody event
+for i in range(len(offsets)):
+	if i in offsetcopy:
+		longlikelihood[i] = offsetcopy.index(i)
+	else:
+		longlikelihood[i] = probs[1,1]
+
+# Number of harmonies we want to set
+
+target = int(len(offsetcopy) * probs[0,1]) + int((len(offsets) - len(offsetcopy)) * probs[1,1])
+
+longlikelihood = np.array(longlikelihood)
 
 # Get the indeces of the highest likelihoods by sorting the array and choosing
 # only the last n indices.
-indices = (likelihood).argsort()[:target]
+indices = (longlikelihood).argsort()[:target]
 indices.sort()
 
 prediction = []
@@ -181,15 +164,27 @@ prediction = []
 for i in indices:
 	prediction.append(offsets[i])
 
-#
-# correct = []
-#
-# for i in range(len(hr_offsets)):
-# 	if hr_offsets[i] in offsets:
-# 		correct.append(offsets.index(hr_offsets[i]))
+success = 0
+for i in prediction:
+	if i in hr_offsets:
+		success += 1
 
+percent = success/len(hr_offsets)
+otherway = success/len(prediction)
+# Jaccard distance
+jd = len((set(prediction) & set(hr_offsets)))/len((set(prediction) | set(hr_offsets)))
+print(jd)
+print(otherway)
+print(percent)
+print(len(prediction))
+print(len(hr_offsets))
+tmpStr = str(prediction) + '\n' + str(hr_offsets) + '\n' + 'Jaccard distance of\
+ the two sets: ' + str(jd) + '\nPercentage of actual\
+ harmonic rhythmic events hit: ' + str(percent) + '\nPercentage of set rhythmic\
+ events that hit an actual rhythmic event: ' + str(otherway) + '\nEvents \
+predicted: ' + str(len(prediction)) + '\nActual events: ' + str(len(hr_offsets))
 
 print('Writing file')
-output = open(sys.argv[3], 'w')
-output.write(str(prediction) + '\n' + str(hr_offsets))
+output = open(sys.argv[4], 'w')
+output.write(tmpStr)
 output.close()
