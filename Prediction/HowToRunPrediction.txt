@@ -1,0 +1,11 @@
+Navigate to Bachelors_Thesis/Prediction
+
+python3.6 prediction.py "/home/waldo/Desktop/Bachelors_Thesis/Prediction/Input/BC_001_026900B_a1.txt.csv" "/home/waldo/Desktop/Bachelors_Thesis/Analysis/Probabilities/Idioms/BachChorales.txt" "/home/waldo/Desktop/Bachelors_Thesis/Prediction/Output/BC_001_026900B_a1.txt"
+python3.6 prediction.py "/home/waldo/Desktop/Bachelors_Thesis/Prediction/Input/Beatles_Michelle [Checked - Giannos].txt.csv" "/home/waldo/Desktop/Bachelors_Thesis/Analysis/Probabilities/Idioms/Beatles.txt" "/home/waldo/Desktop/Bachelors_Thesis/Prediction/Output/Beatles_Michelle [Checked - Giannos].txt"
+python3.6 prediction.py "/home/waldo/Desktop/Bachelors_Thesis/Prediction/Input/JS_The_shadow_of_your_smile_a1 [Checked - Giannos].txt.csv" "/home/waldo/Desktop/Bachelors_Thesis/Analysis/Probabilities/Idioms/Jazz.txt" "/home/waldo/Desktop/Bachelors_Thesis/Prediction/Output/JS_The_shadow_of_your_smile_a1 [Checked - Giannos].txt"
+python3.6 prediction.py "/home/waldo/Desktop/Bachelors_Thesis/Prediction/Input/Mi me peismatoneis_a1[Checked - Giannos].txt.csv" "/home/waldo/Desktop/Bachelors_Thesis/Analysis/Probabilities/Idioms/Rebetika.txt" "/home/waldo/Desktop/Bachelors_Thesis/Prediction/Output/Mi me peismatoneis_a1[Checked - Giannos].txt"
+python3.6 prediction.py "/home/waldo/Desktop/Bachelors_Thesis/Prediction/Input/Balada_Para_Un_Loco.txt.csv" "/home/waldo/Desktop/Bachelors_Thesis/Analysis/Probabilities/Idioms/Tango.txt" "/home/waldo/Desktop/Bachelors_Thesis/Prediction/Output/Balada_Para_Un_Loco.txt"
+
+----
+
+python3.6 prediction.py "/home/waldo/Desktop/Bachelors_Thesis/Prediction/Input/Stravinsky_Pater_Noster [Checked - Giannos].txt.csv" "/home/waldo/Desktop/Bachelors_Thesis/Analysis/Probabilities/Idioms/ChoralNeoclassicalNeotonal.txt" "/home/waldo/Desktop/Bachelors_Thesis/Prediction/Output/Stravinsky_Pater_Noster [Checked - Giannos].txt"
