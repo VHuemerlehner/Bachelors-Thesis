@@ -7,12 +7,14 @@ import sys
 sys.path.insert(0, '/home/waldo/Desktop/Bachelors_Thesis/Analysis')
 import analysis as a
 
+# Check number of input arguments
 if len(sys.argv) != 5:
 	sys.exit('Prediction.py: I need exactly 5 input arguments (myself, a musicXML, its conditional probabilities, its exact offsets and a target file')
 
 print('Creating prediction for ' + sys.argv[1])
+
 # Read in the probabilities: Get the string and put it into a format such that
-# only numbers and colons remain, then split at the colons to get a list
+# only numbers and commata remain, then split at the commata to get a list
 # of number strings and convert this into a numpy array.
 probs_file = open(sys.argv[2], 'r')
 probs_str = probs_file.read()
@@ -37,12 +39,14 @@ probs = np.array(probs_list)
 probs = probs.reshape(2,9)
 probs_file.close()
 
+# Initialising offset-lists
 offsets = []
 hr_offsets = []
-# Read in the offsets
+# Read in the offsets, splitting at the line boundary
 off_file = open(sys.argv[3], 'r')
 off_str = off_file.read()
 off_str = off_str.split('\n')
+# Cut off the brackets, split the rest at commata and convert to float
 for i in off_str[0][1:-1].split(','):
 	offsets.append(float(i))
 for i in off_str[1][1:-1].split(','):
@@ -76,6 +80,7 @@ hr = ana[0]
 mr = ana[1]
 mp = ana[2]
 ts = ana[4]
+
 # Get all the needed parameters
 patana = a.patcomparison(hr, mr, ts)
 coocc = patana[0]
@@ -88,12 +93,10 @@ contour = pitchanalysis[1]
 #hr given mr) distributed such that the most likely mr's receive them. Thus:
 #Give likelihoods to all mr's, then choose the highest ones until percentage is
 #reached.
-
-# ####a contour change; a melody onset; unisons; steps; jumps; jumps bigger than or
-# ####equal to an octave; low syncopation; medium syncopation; high syncopation.
+# Initialise likelihood-list
 likelihood = [None] * len(offsets)
 
-# Sum the probabilities for each melody onset and all strong beats, and get the
+# Sum the probabilities for each melody onset, and get the
 # mean as the overall probability for that time.
 for i in range(len(offsets)):
 	summedprobs = 0
@@ -128,7 +131,7 @@ for i in range(len(offsets)):
 # Create a copy so we don't lose the old info
 offsetcopy = list(offsets)
 
-# Add strong beats, if not yet in there
+# Add strong beats as possible further harmony onsets, if not yet in there
 for i in range(int(offsets[-1])):
 	if i not in offsets:
 		offsets.append
@@ -140,7 +143,8 @@ offsets = sorted(offsets)
 longlikelihood = [None] * len(offsets)
 
 # Copy old values, for new ones, assign the probability given the absence of
-# a melody event
+# a melody event (further improvement may result from using adjacent syncopation
+# and interval values)
 for i in range(len(offsets)):
 	if i in offsetcopy:
 		longlikelihood[i] = offsetcopy.index(i)
@@ -148,9 +152,9 @@ for i in range(len(offsets)):
 		longlikelihood[i] = probs[1,1]
 
 # Number of harmonies we want to set
-
 target = int(len(offsetcopy) * probs[0,1]) + int((len(offsets) - len(offsetcopy)) * probs[1,1])
 
+# Convert the list into a numpy array for sorting
 longlikelihood = np.array(longlikelihood)
 
 # Get the indeces of the highest likelihoods by sorting the array and choosing
@@ -158,32 +162,34 @@ longlikelihood = np.array(longlikelihood)
 indices = (longlikelihood).argsort()[:target]
 indices.sort()
 
+# Initialise prediction list
 prediction = []
 
 # Get the actual timings from the indices.
 for i in indices:
 	prediction.append(offsets[i])
 
+# For calculating percentages of correct guesses
 success = 0
 for i in prediction:
 	if i in hr_offsets:
 		success += 1
 
+# Percentage of actual events correctly predected
 percent = success/len(hr_offsets)
+# Percentage of predicted events that hit an actual event
 otherway = success/len(prediction)
-# Jaccard distance
+# Jaccard distance between the two sets
 jd = len((set(prediction) & set(hr_offsets)))/len((set(prediction) | set(hr_offsets)))
-print(jd)
-print(otherway)
-print(percent)
-print(len(prediction))
-print(len(hr_offsets))
+
+# Create the string to be written into the file
 tmpStr = str(prediction) + '\n' + str(hr_offsets) + '\n' + 'Jaccard distance of\
  the two sets: ' + str(jd) + '\nPercentage of actual\
  harmonic rhythmic events hit: ' + str(percent) + '\nPercentage of set rhythmic\
  events that hit an actual rhythmic event: ' + str(otherway) + '\nEvents \
 predicted: ' + str(len(prediction)) + '\nActual events: ' + str(len(hr_offsets))
 
+# File printing
 print('Writing file')
 output = open(sys.argv[4], 'w')
 output.write(tmpStr)

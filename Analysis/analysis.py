@@ -2,32 +2,12 @@
 """
 @author: Valentin Huemerlehner
 """
-#TODO: Rewrite documentation
-#Helper function to find word in string:
-
 import numpy as np
-
-
-#NEVER USED; DELETE
-# def smart_find(haystack, needle):
-# 	if haystack.startswith(needle+" "):
-# 		return 0
-# 	if haystack.endswith(" "+needle):
-# 		return len(haystack)
-# 	if haystack.find(" "+needle+" ") != -1:
-# 		return haystack.find(' ' + needle + ' ')
-# 	return -1
-
-#This function splits the long list of rows of the .csv-files into five
-#separate ones containing information about harmonic rhythm, melodic rhythm,
-#melody pitches, grouping and time signatures. These lists get appended into
-#one list as return value.
 
 #Our input: A list with a list for each row of the .csv, containing either:
 #TS - 3/4 OR Grp - 0.0 OR - Bar - (Harmonic Rhythm) 0 2  - cont.
 #(Melodic Rhythm) 0 1 2 3 - (Pitches) 66 68 70 71
 
-##DOCUMENTATIONISFORPUSSIES #IHATEMYSELFALREADY #GOTLUCKYREMEMBEREDEVERYTHING
 #The following function creates five lists of equal length: tsinf, grpinf
 #hrinf, mrinf and mpinf. Each of them contains for each bar in sequence: Time
 #Signature, grouping (1 = beginning of group, 2 = intermediate, 3 = ending)
@@ -40,8 +20,6 @@ def splitintolists(data):
 	mpinf = []
 	grpinf = []
 	tsinf = []
-	offsets = []
-	hr_offsets = []
 	tsstring = ''
 	grpint = 0
 
@@ -97,20 +75,7 @@ def splitintolists(data):
 		mrinf[i] = list(mrinf[i].split())
 		mpinf[i] = list(mpinf[i].split())
 
-	# # For debugging:
-	# print('Harmonic Rhythm\n')
-	# print(hrinf)
-	# print('\n\nMelodic Rhythm\n')
-	# print(mrinf)
-	# print('\n\nMelody Pitches\n')
-	# print(mpinf)
-	# print('\n\nGrouping\n')
-	# print(grpinf)
-	# print('\n\nTime Signatures\n')
-	# print(tsinf)
-	# print('\n\n\nAre all lists of equal length?\n' + str((len(hrinf) == len(mrinf)) and (len(mpinf) == len(grpinf)) and (len(grpinf) == len(tsinf))))
-
-	#Write it all in one list so we only hand around one object. Like a folder. Just dumb.
+	#Write it all in one list so we only hand around one object
 	returnlist = []
 	returnlist.append(hrinf)
 	returnlist.append(mrinf)
@@ -118,44 +83,6 @@ def splitintolists(data):
 	returnlist.append(grpinf)
 	returnlist.append(tsinf)
 	return returnlist
-
-
-#-------------------------------------------------------------------------------
-
-
-# NEVER USED?! DELETE
-#
-# # The following function sums over a list of given rhythmic patterns to
-# # determine the frequency of each occuring pattern. It outputs a dictionary
-# # with 'pattern: [sum, frequency]'.
-# def patfrequency(rpinf):
-# 	# Initialising variables: 2 lists for patterns and occurences and the dict
-# 	# to put it all in
-# 	rpdict = {}
-# 	patlist = []
-# 	occurencelist = []
-#
-# 	# Running through the data, make a marker for new or old pattern
-# 	for i in rpinf:
-# 		newTS = True
-# 		for j in patlist:
-# 			if i == j:
-# 				newTS = False
-# 		# If the pattern is new, add it to the list and add an occurence entry
-# 		if newTS:
-# 			patlist.append(i)
-# 			occurencelist.append(1)
-# 		# Else find it in the list and edit the corresponding occurence entry
-# 		else:
-# 			k = 0
-# 			while (i != patlist[k]) and (k<len(patlist)):
-# 				k += 1
-# 			occurencelist[k] += 1
-#
-# 	# Write it all into the dict
-# 	for i in range(len(patlist)):
-# 		rpdict.update({tuple(patlist[i]): [occurencelist[i], occurencelist[i]/len(rpinf)]})
-# 	return rpdict
 
 
 #-------------------------------------------------------------------------------
@@ -170,19 +97,16 @@ def splitintolists(data):
 
 
 def patcomparison(hr, mr, ts):
+	# Initialising variables
 	results = []
 	coocc = 0
 	honsets = 0
 	monsets = 0
-	#Missing documentation... Smort. Not.
-	#Since there should be as many harmonic patterns as melodic ones, iterate
-	#over one list and simply count the number of elements in all the lists
-	#inside it. Then check if in one pattern (which can be maximally one bar
-	#long, thus never repeating the same number within itself) both lists show
-	#the same number, meaning that harmony and melody cooccur. Interestingly
-	#enough, harmonic changes need not necessarily fall onto melodic ones
-	#(although this is rare enough even in the most complicated idioms tested
-	#to be ignored without a significant performance hit)
+	# Since there are as many harmonic patterns as melodic ones, iterate
+	# over one list and simply count the number of elements in all the lists
+	# inside it. Then check if in one pattern (which can be maximally one bar
+	# long, thus never repeating the same number within itself) both lists show
+	# the same number, meaning that harmony and melody cooccur.
 	for i in range(len(hr)):
 		honsets += len(hr[i])
 		monsets += len(mr[i])
@@ -199,6 +123,7 @@ def patcomparison(hr, mr, ts):
 	# and the note stops after the next strong beat, but not later than the
 	# following one, D(x)=2/(T(x)). If it ends even later, D(x)=1/(T(x))
 	# Take the average of all notes in a rhythm to get the WNBD.
+	# See also the thesis on this topic.
 	# In code more like: If on strong beat: 0; else: if ends between next two
 	# strong beats, 2/T(x); else: 1/T(x)
 	# Sum all these, divide by number of notes.
@@ -244,20 +169,17 @@ def patcomparison(hr, mr, ts):
 					if onsets[k] in strong:
 						distance += 0
 					else:
-						# distance to next strong beat (no matter the direction):
+						# Distance to next strong beat (no matter the direction):
 						# Minimum of the differences between the onset and all strong
 						# beats, absolute value so direction does not matter
 						dtb = min(abs(onsets[k] - l) for l in strong)
 						# print(dtb)
 						for l in strong:
 							if l > onsets[k]:
-								# distance to the next occurring beat (forwards)
+								# Distance to the next occurring beat (forwards)
 								dtn = l - onsets[k]
-
-								# Does this even make sense?
-								#Check again.
-								if l != strong[-1]:
-									# distance to two beats ahead
+								# Distance to two beats ahead
+								if l < strong[-1]:
 									dtta = dtn + incr
 								break
 						# If the offbeat note stops between the next two strong beats,
@@ -266,27 +188,26 @@ def patcomparison(hr, mr, ts):
 							distance += 2/dtb
 						else:
 							distance += 1/dtb
-			# treat the last onset differently (assume it ends on the pattern ending)
+			# Treat the last onset differently (assume it ends on the pattern ending)
 			# need to reset distances
 			dtn = 0
 			dtta = 0
 			last_onset = onsets[-1]
-			# if on a strong beat, ignore
+			# If on a strong beat, ignore
 			if last_onset in strong:
 				distance += 0
-			# else assume it ends on the pattern ending (the latest)
+			# Else assume it ends the latest on the pattern ending
 			else:
-				# get minimal distance to beat
+				# Get minimal distance to beat
 				dtb = min(abs(last_onset - l) for l in strong)
-				# print(dtb)
-				# get distance to following strong beat (if applicable)
+				# Get distance to following strong beat (if applicable)
 				followed = False
 				for l in strong:
 					if l > last_onset:
 						followed = True
 						dtn = l - last_onset
 						dtta = dtn + incr
-						# get the next beat's index (no duplicates, so this works)
+						# Get the next beat's index (no duplicates, so this works)
 						ind = strong.index(l)
 						break
 				# If the pattern ending is between 1 and 2 beats after the onset,
@@ -307,12 +228,9 @@ def patcomparison(hr, mr, ts):
 		else:
 			pass
 
-	# results.append(coocc)
-	# results.append(coocc/len(hr))
-	# results.append(coocc/honsets)
+	# We only need the percentage of cooccurences on melody onsets as a
+	# conditional probability and the wnbD measure.
 	results.append(coocc/monsets)
-	# results.append(monsets-honsets)
-	# results.append((monsets-honsets)/len(hr))
 	results.append(wnbdList)
 	return results
 
@@ -325,62 +243,41 @@ def patcomparison(hr, mr, ts):
 #tritones very high) and add this up. This can then be correlated to the number
 #of harmony changes in the corresponding bar/piece.
 def pitchana(mp, hr, mr, ts):
+
+	# Initialising result list, helper lists and counting variables
 	results = []
 	pitches = []
-	# offsets = []
-	# hr_offsets = []
-	# # First, we need to get all pitches into one long list of integers, same
-	# # with their offsets and the harmonic rhythm offsets, those as floats
-	# # because they contain .5 values and we actually do maths on them
+	offsets = []
+	hr_offsets = []
+	bar_count = 0
+	addendum = 0
+
+	# First, we need to get all pitches into one long list of integers, same
+	# with their offsets and the harmonic rhythm offsets, those as floats
+	# because they contain .5 values and we actually do maths on them
 	for i in mp:
 		for j in i:
 			pitches.append(int(j))
-	# for i in mr:
-	# 	for j in i:
-	# 		offsets.append(float(j))
-	# for i in hr:
-	# 	for j in i:
-	# 		hr_offsets.append(float(j))
-	#
-	# #Restore actual timings for melodic rhythm by adding the numerator of the
-	# #TS for each bar to the offsets (hacky solution, but that's what you get for
-	# #not thinking projects through in the beginning...)
-	# bar_count = 0
-	# for i in range(len(offsets)-1):
-	# 	if offsets[i+1] <= offsets[i]:
-	# 		for j in range(i+1, len(offsets)):
-	# 			#Not as complicated as it seems: TS are stored as strings that
-	# 			#we now split at "/" and divide the numerator by the denominator,
-	# 			#then casting as integers and multiplying with 4 since our timings
-	# 			#are thought in 4ths
-	# 			offsets[j] += (int(ts[bar_count].split('/')[0])/int(ts[bar_count].split('/')[1]))*4
-	# 		bar_count += 1
-	#
-	# #Same bs for harmonic rhythm.
-	# bar_count = 0
-	# for i in range(len(hr_offsets)-1):
-	# 	if hr_offsets[i+1] <= hr_offsets[i]:
-	# 		for j in range(i+1, len(hr_offsets)):
-	# 			hr_offsets[j] += (int(ts[bar_count].split('/')[0])/int(ts[bar_count].split('/')[1]))*4
-	#
-	# if offsets[0] != 0:
-	# 	for k in range(len(offsets)):
-	# 		offsets[k] -= offsets[0]
 
-	offsets = []
-	hr_offsets = []
-	possible = []
-	bar_count = 0
-	addendum = 0
+	# Melodic rhythm
 	for i in mr:
+		# What we need to add is determined by the time signature: take its
+		# numerator divided by the denominator (splitting the string at the '/'
+		# will give you those) and then multiply by 4 since we calculate in base
+		# fourth (by which I mean fourths are our unit)
 		addendum += (int(ts[bar_count].split('/')[0])/int(ts[bar_count].split('/')[1]))*4
+		# Then add this to all following patterns
 		for j in i:
 			m = float(j) + addendum
 			offsets.append(float(m))
+		# Go to the next bar to get the correct time signature
 		bar_count += 1
 
+	# Harmonic rhythm
+	# Reset the two counting variables
 	addendum = 0
 	bar_count = 0
+	# Same thing for harmonic rhythm, see above
 	for i in hr:
 		addendum += (int(ts[bar_count].split('/')[0])/int(ts[bar_count].split('/')[1]))*4
 		for j in i:
@@ -388,78 +285,81 @@ def pitchana(mp, hr, mr, ts):
 			hr_offsets.append(float(m))
 		bar_count += 1
 
+	# Since for some reason, melodic rhythm sometimes starts with non-zero
+	# values while harmonic rhythm always starts with 0, we need to adapt by
+	# subtracting the corresponding number from all melodic offsets
 	if offsets[0] != 0:
 		subtractor = offsets[0]
 		for k in range(len(offsets)):
 			offsets[k] -= subtractor
 
+	# Initialising more variables: lists for results
 	intervals = [None] * (len(pitches))
 	contour = [None] * (len(pitches))
 	intervals_abs = [None] * (len(pitches))
-	distanceabs = 0
-	distancerel = 0
 
-	# "Tonal" distance in the melody: correlate occurence of interval with
-	# occurence of new harmony, thus finding probabilities for a harmony change
-	# given an interval. We create 2 counting buckets for all intervals from
-	# unison (0 half tones) to octave (12 half tones) each and two bucket for
-	# all intervals bigger than one octave. Thus, direction is preserved. In
-	# case direction is not important, we also count the absolute intervals in
-	# interval_abs_counter, thusly only half the size of interval_counter.
-	# Unisons are counted in both directions, later halfed
+	# Given interval size, how probable are harmonic rhythmic events? I counted
+	# all intervals separately in the beginning, but because of the lack of
+	# more data, I toned it down to the four categories of unison, step, jump
+	# and jump equal or bigger to/than an octave. Direction was also left out.
+	# Much of the following code is
+	# therefore not totally necessary and was commented out.
 	interval_counter = []
-	intervals_up = [0] * 14
-	intervals_down = [0] * 14
+	# intervals_up = [0] * 14
+	# intervals_down = [0] * 14
 	interval_abs_counter = [0] * 14
-	intervals_up_change = [0] * 14
-	intervals_down_change = [0] * 14
+	# intervals_up_change = [0] * 14
+	# intervals_down_change = [0] * 14
+
+	# This counts how often the harmony changes on a specific interval.
 	intervals_abs_change = [0] * 14
 
-	# 'intervals' contains the direction and size of melodic steps, 'contour'
-	# extracts only the direction of
-	# movement, intervals_abs only the amount of movement
+	# 'contour' extracts only the direction of
+	# movement, 'intervals_abs' only the amount of movement
+
 	# First, we need to get all pitches into one list to iterate through.
 	# The first interval is always 0, since there is no movement to be found.
 	intervals[0] = 0
+	# There will always be one less interval than notes because you need two
+	# notes to relate them.
 	for i in range(len(pitches)-1):
-		# definition of an interval applied: the distance between two adjacent
+		# Definition of an interval applied: the distance between two adjacent
 		# pitches
 		intervals[i+1] = pitches[i+1]-pitches[i]
 		# Different cases: Upwards interval
 		# Contour and absolute intervals are denoted, and the counters for
-		# each interval size are adjusted. Usage of separate counters for up-
-		# and downwards motion is justified so as to make indexing easier.
+		# each interval size are adjusted.
 	for i in range(len(intervals)):
 		if intervals[i] > 0:
 			contour[i] = 1
 			intervals_abs[i] = intervals[i]
 			if (intervals[i] > 12):
-				intervals_up[13] += 1
+				# intervals_up[13] += 1
 				interval_abs_counter[13] += 1
 				if offsets[i] in hr_offsets:
-					intervals_up_change[13] += 1
+					# intervals_up_change[13] += 1
 					intervals_abs_change[13] += 1
 			else:
-				intervals_up[intervals[i]] += 1
+				# intervals_up[intervals[i]] += 1
 				interval_abs_counter[intervals[i]] += 1
 				if offsets[i] in hr_offsets:
-					intervals_up_change[intervals[i]] += 1
+					# intervals_up_change[intervals[i]] += 1
 					intervals_abs_change[intervals[i]] += 1
 		# Or downwards interval
 		elif intervals[i] < 0:
 			contour[i] = -1
 			intervals_abs[i] = -intervals[i]
 			if intervals[i] < -12:
-				intervals_down[13] += 1
+				# intervals_down[13] += 1
 				interval_abs_counter[13] += 1
 				if offsets[i] in hr_offsets:
-					intervals_down_change[13] += 1
+					# intervals_down_change[13] += 1
 					intervals_abs_change[13] += 1
 			else:
-				intervals_down[intervals_abs[i]] += 1
+				# intervals_down[intervals_abs[i]] += 1
 				interval_abs_counter[intervals_abs[i]] += 1
 				if offsets[i] in hr_offsets:
-					intervals_down_change[intervals_abs[i]] += 1
+					# intervals_down_change[intervals_abs[i]] += 1
 					intervals_abs_change[intervals_abs[i]] += 1
 		# Or unison, so no direction.
 		# Since both directional lists start with the unison, it is counted
@@ -467,34 +367,25 @@ def pitchana(mp, hr, mr, ts):
 		else:
 			contour[i] = 0
 			intervals_abs[i] = 0
-			intervals_up[0] += 1
-			intervals_down[0] += 1
+			# intervals_up[0] += 1
+			# intervals_down[0] += 1
 			interval_abs_counter[0] += 1
-			intervals_up_change[0] += 1
-			intervals_down_change[0] += 1
+			# intervals_up_change[0] += 1
+			# intervals_down_change[0] += 1
 			intervals_abs_change[0] += 1
 
-	# Joining of the respective two directional lists, reversing the downwards
-	# one and taking out one of the unisons.
-	# Result: [down more than octave, down octave, down major seventh, ...
-	# unison, up minor second, up major second, ... up more than octave]
-	interval_counter = list(reversed(intervals_down[1:])) + intervals_up
-	interval_change_counter = list(reversed(intervals_down_change[1:])) + intervals_up_change
+	# interval_counter = list(reversed(intervals_down[1:])) + intervals_up
+	# interval_change_counter = list(reversed(intervals_down_change[1:])) + intervals_up_change
 
-
-	for i in range(len(intervals_abs)):
-		distanceabs = distanceabs + intervals_abs[i]
-
-	distancerel = distanceabs/(len(pitches)-1)
-	# actual contour definition: only direction changes are denoted. Here I
+	# Actual contour definition: only direction changes are denoted. Here I
 	# apply the idea of monotony, as opposed to strict monotony, i.e. pitch
 	# repetitions do not count as direction change.
 	contourdir = [0] * len(contour)
 	for i in range(len(contour)):
-		# first direction is always new, thus first run through loop gives a 1
+		# First direction is always new, thus first run through loop gives a 1
 		if i == 0:
 			contourdir[i] = 1
-		# lateron: if the contour is 0 (pitch repetition), it does not count
+		# Lateron: if the contour is 0 (pitch repetition), it does not count
 		# as change; else: if the direction is the same as before, denote no
 		# change, else do so.
 		else:
@@ -505,29 +396,9 @@ def pitchana(mp, hr, mr, ts):
 			else:
 				contourdir[i] = 1
 
-	# print('Overall absolute interval size')
-	# print(distanceabs)
-	# print('Average interval size')
-	# print(distancerel)
-	# print('Interval counts')
-	# print(interval_counter)
-	# print('Absolute interval counts')
-	# print(interval_abs_counter)
-	# print('Interval change counts')
-	# print(interval_change_counter)
-	# print('Absolute interval change counts')
-	# print(intervals_abs_change)
-
 	# Write everything into the results-handle for return
 	results.append(intervals_abs)
-	# results.append(contour)
 	results.append(contourdir)
-	# results.append(distanceabs)
-	# results.append(distancerel)
-	# results.append(interval_counter)
-	# results.append(interval_abs_counter)
-	# results.append(interval_change_counter)
-	# results.append(intervals_abs_change)
 
 	return results
 
@@ -550,62 +421,31 @@ def pitchana(mp, hr, mr, ts):
 
 
 def probabilities(intervals, contour, coocc, syncopation, hr, mr, ts):
-	# Get all melody and harmony offsets into one list, not list of lists
-	# offsets = []
-	# hr_offsets = []
-	# for i in mr:
-	# 	for j in i:
-	# 		offsets.append(float(j))
-	# for i in hr:
-	# 	for j in i:
-	# 		hr_offsets.append(float(j))
-	#
-	# #Restore actual timings for melodic rhythm by adding the numerator of the
-	# #TS for each bar to the offsets (hacky solution, but that's what you get for
-	# #not thinking projects through in the beginning...)
-	# bar_count = 0
-	#
-	# # Some pieces begin not at the beginning of a bar, therefore raising the
-	# # need to take off the corresponding timing to get absolute timings (we
-	# # still want to start with 0)
-	#
-	# if offsets[0] != 0:
-	# 	for k in range(len(offsets)):
-	# 		offsets[k] -= offsets[0]
-	#
-	#
-	# # Now iterate through the offsets and do what was described earlier.
-	# for i in range(len(offsets)-1):
-	# 	if offsets[i+1] <= offsets[i]:
-	# 		for j in range(i+1, len(offsets)):
-	# 			#Not as complicated as it seems: TS are stored as strings that
-	# 			#we now split at "/" and divide the numerator by the denominator,
-	# 			#then casting as integers and multiplying with 4 since our timings
-	# 			#are thought in 4ths
-	# 			offsets[j] += (int(ts[bar_count].split('/')[0])/int(ts[bar_count].split('/')[1]))*4
-	# 		bar_count += 1
-	#
-	# #Same bs for harmonic rhythm.
-	# bar_count = 0
-	# for i in range(len(hr_offsets)-1):
-	# 	if hr_offsets[i+1] <= hr_offsets[i]:
-	# 		for j in range(i+1, len(hr_offsets)):
-	# 			hr_offsets[j] += (int(ts[bar_count].split('/')[0])/int(ts[bar_count].split('/')[1]))*4
-	# 		bar_count += 1
+	# Initialising offset lists and counting variables
 	offsets = []
 	hr_offsets = []
-	possible = []
 	bar_count = 0
 	addendum = 0
+
+	# Melodic rhythm
 	for i in mr:
+		# What we need to add is determined by the time signature: take its
+		# numerator divided by the denominator (splitting the string at the '/'
+		# will give you those) and then multiply by 4 since we calculate in base
+		# fourth (by which I mean fourths are our unit)
 		addendum += (int(ts[bar_count].split('/')[0])/int(ts[bar_count].split('/')[1]))*4
+		# Then add this to all following patterns
 		for j in i:
 			m = float(j) + addendum
 			offsets.append(float(m))
+		# Go to the next bar to get the correct time signature
 		bar_count += 1
 
+	# Harmonic rhythm
+	# Reset the two counting variables
 	addendum = 0
 	bar_count = 0
+	# Same thing for harmonic rhythm, see above
 	for i in hr:
 		addendum += (int(ts[bar_count].split('/')[0])/int(ts[bar_count].split('/')[1]))*4
 		for j in i:
@@ -613,10 +453,14 @@ def probabilities(intervals, contour, coocc, syncopation, hr, mr, ts):
 			hr_offsets.append(float(m))
 		bar_count += 1
 
+	# Since for some reason, melodic rhythm sometimes starts with non-zero
+	# values while harmonic rhythm always starts with 0, we need to adapt by
+	# subtracting the corresponding number from all melodic offsets
 	if offsets[0] != 0:
 		subtractor = offsets[0]
 		for k in range(len(offsets)):
 			offsets[k] -= subtractor
+
 
 	# Counting variables
 	counter = 0
@@ -647,18 +491,25 @@ def probabilities(intervals, contour, coocc, syncopation, hr, mr, ts):
 	# Iterate through interval list: Count each category and check if the
 	# melody offset cooccurs with a harmony offset.
 	for i in range(len(intervals)):
+
+		# Unison
 		if intervals[i] == 0:
 			unicount += 1
 			if offsets[i] in hr_offsets:
 				uniharm += 1
+
+		# Step
 		elif abs(intervals[i]) == 1 or abs(intervals[i]) == 2:
 			stepcount += 1
 			if offsets[i] in hr_offsets:
 				stepharm += 1
+
+		# Jump
 		elif abs(intervals[i]) >= 12:
 			octcount += 1
 			if offsets[i] in hr_offsets:
 				octharm += 1
+		# Big jump (octave+)
 		else:
 			jumpcount += 1
 			if offsets[i] in hr_offsets:
@@ -679,7 +530,8 @@ def probabilities(intervals, contour, coocc, syncopation, hr, mr, ts):
 		octprob = octharm / octcount
 	else: octprob = 0
 
-
+	# More counting variables, again for occurences and corresponding harmony
+	# changes
 	low_sync = 0
 	med_sync = 0
 	high_sync = 0
@@ -687,19 +539,29 @@ def probabilities(intervals, contour, coocc, syncopation, hr, mr, ts):
 	medharm = 0
 	highharm = 0
 
+	# For the three syncopation categories found, count their occurences and
+	# how often harmonic changes cooccur.
 	for i in range(len(syncopation)):
+
+		# Low syncopation
 		if syncopation[i] <= 0.5:
 			low_sync += 1
 			if offsets[i] in hr_offsets:
 				lowharm += 1
+
+		# Medium syncopation
 		elif syncopation[i] <= 1:
 			med_sync += 1
 			if offsets[i] in hr_offsets:
 				medharm += 1
+
+		# High syncopation
 		else:
 			high_sync += 1
 			if offsets[i] in hr_offsets:
 				highharm += 1
+
+	# Calculate the probabilities
 	if low_sync != 0:
 		lowprob = lowharm / low_sync
 	else: lowprob = 0
@@ -710,6 +572,7 @@ def probabilities(intervals, contour, coocc, syncopation, hr, mr, ts):
 		highprob = highharm/high_sync
 	else: highprob = 0
 
+	# Put everything in a numpy array as a result.
 	results = np.array([[contprob, coocc, uniprob, stepprob, jumpprob, octprob,\
 	lowprob, medprob, highprob], [1-contprob, 1-coocc, 1-uniprob, 1-stepprob,\
 	1-jumpprob, 1-octprob, 1-lowprob, 1-medprob, 1-highprob]])

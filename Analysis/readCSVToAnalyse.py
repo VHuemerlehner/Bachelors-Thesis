@@ -29,21 +29,9 @@ if len(allDocs) < 1:
 # For calculating syncopation thresholds only
 # sync = []
 
-#counting variables TODO: documentation
+# Counting variables for the idiom probabilities
 all_mr = 0
 all_probs = np.zeros((2,9))
-
-
-
-###Idea: take grouping info to calculate number of bars.
-def getMROffsets(mr, rows):
-	for i in range(len(mr)):
-
-
-
-
-def getHROffsets(hr):
-
 
 for pieceName in allDocs:
 	print('Analysing piece: ' + pieceName + '...')
@@ -61,47 +49,59 @@ for pieceName in allDocs:
 				row[3] = row[3].replace(']', '')
 				row[3] = row[3].replace(',', '')
 			rows.append(row)
-
+	# Get harmonic rhythm, melodic rhythm, melody pitches and time signatures
 	giant_list = analysis.splitintolists(rows)
+	hr = giant_list[0]
+	mr = giant_list[1]
+	mp = giant_list[2]
+	ts = giant_list[4]
 
-	#giant_list contains hr, mr, mp, grp, ts in chronological lists
-	# harmonic_rhythm = analysis.patfrequency(giant_list[0])
-	# melodic_rhythm = analysis.patfrequency(giant_list[1])
-	pattern_comparison = analysis.patcomparison(giant_list[0], giant_list[1], giant_list[4])
-	pitch_analysis = analysis.pitchana(giant_list[2], giant_list[0], giant_list[1], giant_list[4])
+	# Get cooccurences and syncopation
+	pattern_comparison = analysis.patcomparison(hr, mr, ts)
+	# Get intervals and contour
+	pitch_analysis = analysis.pitchana(mp, hr, mr, ts)
 
 	# For calculating syncopation thresholds only
 	# sync.append(pattern_comparison[1])
+
+	# Get the probabilities from the above calculated parameters
 	probabilities = analysis.probabilities(pitch_analysis[0], pitch_analysis[1],\
 	pattern_comparison[0], pattern_comparison[1], giant_list[0], giant_list[1],\
 	giant_list[4])
 
 	# Get the probabilities for the entire idiom by weighting each pieces'
 	# probabilities according to melody onsets and then averaging.
+	# For this, we first need a proper count of all mr events.
+	offsets = []
+	for i in giant_list[1]:
+		for j in i:
+			offsets.append(j)
+	offcount = len(offsets)
 
-	offcount = len(giant_list[1])
-
+	# Probabilities get weighted accordingly
 	weighted_probs = probabilities * offcount
 
+	# And added to the overall probabilities
 	all_probs = np.add(weighted_probs, all_probs)
 
+	# For later averaging
 	all_mr += offcount
 
-	#file management, open file
+	# File management, open file
 	splitName = pieceName.split('.')
 	noExtName = splitName[0]
 	finalName = noExtName+'.txt'
 	text_file = open(finalName, 'w')
 
-	#write file
+	# Write file
 	text_file.write(str(probabilities) + '\n' + str(len(giant_list[1])))
 	text_file.close()
 	os.rename(currFolder+finalName, destFolder+finalName)
 
-# 2X9 matrix with probabilities for one idiom
+# 2X9 matrix with probabilities for one idiom, averaging over all pieces
 idiom_probs = all_probs / all_mr
 
-# write file
+# Write idiom file
 print('Writing idiom file')
 file = open('/home/waldo/Desktop/Bachelors_Thesis/Analysis/Probabilities/Idioms/' + 'Tango.txt', 'w')
 file.write(str(idiom_probs))
