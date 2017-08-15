@@ -302,17 +302,17 @@ def pitchana(mp, hr, mr, ts):
 	# all intervals separately in the beginning, but because of the lack of
 	# more data, I toned it down to the four categories of unison, step, jump
 	# and jump equal or bigger to/than an octave. Direction was also left out.
-	# Much of the following code is
-	# therefore not totally necessary and was commented out.
-	interval_counter = []
+	# In the end I decided to count the hr cooccurences with the intervals
+	# in the following method "probabilities", thus much of the following code
+	# is unnecessary and therefore commented out.
+
+	# interval_counter = []
 	# intervals_up = [0] * 14
 	# intervals_down = [0] * 14
-	interval_abs_counter = [0] * 14
+	# interval_abs_counter = [0] * 14
 	# intervals_up_change = [0] * 14
 	# intervals_down_change = [0] * 14
-
-	# This counts how often the harmony changes on a specific interval.
-	intervals_abs_change = [0] * 14
+	# intervals_abs_change = [0] * 14
 
 	# 'contour' extracts only the direction of
 	# movement, 'intervals_abs' only the amount of movement
@@ -333,34 +333,34 @@ def pitchana(mp, hr, mr, ts):
 		if intervals[i] > 0:
 			contour[i] = 1
 			intervals_abs[i] = intervals[i]
-			if (intervals[i] > 12):
-				# intervals_up[13] += 1
-				interval_abs_counter[13] += 1
-				if offsets[i] in hr_offsets:
-					# intervals_up_change[13] += 1
-					intervals_abs_change[13] += 1
-			else:
-				# intervals_up[intervals[i]] += 1
-				interval_abs_counter[intervals[i]] += 1
-				if offsets[i] in hr_offsets:
-					# intervals_up_change[intervals[i]] += 1
-					intervals_abs_change[intervals[i]] += 1
+			# if (intervals[i] > 12):
+			# 	intervals_up[13] += 1
+			# 	interval_abs_counter[13] += 1
+			# 	if offsets[i] in hr_offsets:
+			# 		intervals_up_change[13] += 1
+			# 		intervals_abs_change[13] += 1
+			# else:
+			# 	intervals_up[intervals[i]] += 1
+			# 	interval_abs_counter[intervals[i]] += 1
+			# 	if offsets[i] in hr_offsets:
+			# 		intervals_up_change[intervals[i]] += 1
+			# 		intervals_abs_change[intervals[i]] += 1
 		# Or downwards interval
 		elif intervals[i] < 0:
 			contour[i] = -1
 			intervals_abs[i] = -intervals[i]
-			if intervals[i] < -12:
-				# intervals_down[13] += 1
-				interval_abs_counter[13] += 1
-				if offsets[i] in hr_offsets:
-					# intervals_down_change[13] += 1
-					intervals_abs_change[13] += 1
-			else:
-				# intervals_down[intervals_abs[i]] += 1
-				interval_abs_counter[intervals_abs[i]] += 1
-				if offsets[i] in hr_offsets:
-					# intervals_down_change[intervals_abs[i]] += 1
-					intervals_abs_change[intervals_abs[i]] += 1
+			# if intervals[i] < -12:
+			# 	intervals_down[13] += 1
+			# 	interval_abs_counter[13] += 1
+			# 	if offsets[i] in hr_offsets:
+			# 		intervals_down_change[13] += 1
+			# 		intervals_abs_change[13] += 1
+			# else:
+			# 	intervals_down[intervals_abs[i]] += 1
+			# 	interval_abs_counter[intervals_abs[i]] += 1
+			# 	if offsets[i] in hr_offsets:
+			# 		intervals_down_change[intervals_abs[i]] += 1
+			# 		intervals_abs_change[intervals_abs[i]] += 1
 		# Or unison, so no direction.
 		# Since both directional lists start with the unison, it is counted
 		# twice.
@@ -369,10 +369,10 @@ def pitchana(mp, hr, mr, ts):
 			intervals_abs[i] = 0
 			# intervals_up[0] += 1
 			# intervals_down[0] += 1
-			interval_abs_counter[0] += 1
+			# interval_abs_counter[0] += 1
 			# intervals_up_change[0] += 1
 			# intervals_down_change[0] += 1
-			intervals_abs_change[0] += 1
+			# intervals_abs_change[0] += 1
 
 	# interval_counter = list(reversed(intervals_down[1:])) + intervals_up
 	# interval_change_counter = list(reversed(intervals_down_change[1:])) + intervals_up_change
